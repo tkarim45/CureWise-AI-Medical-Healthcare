@@ -1,0 +1,5 @@
+
+brew install postgresql
+brew services start postgresql
+psql -l
+createdb curewise
