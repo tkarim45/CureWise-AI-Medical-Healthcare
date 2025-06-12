@@ -326,6 +326,24 @@ const SuperAdminDashboard = () => {
     }
   };
 
+  // When creating a doctor, ensure hospital_id is included in the payload
+  const handleAddDoctor = async (doctorForm) => {
+    try {
+      const payload = { ...doctorForm };
+      if (!payload.hospital_id) {
+        alert("Please select a hospital for the doctor.");
+        return;
+      }
+      await axios.post(`${API_URL}/api/doctors`, payload, { headers: { Authorization: `Bearer ${token}` } });
+      // Refetch doctors
+      const doctorsRes = await axios.get(`${API_URL}/api/doctors`, { headers: { Authorization: `Bearer ${token}` } });
+      setDoctors(doctorsRes.data);
+      // Close modal, reset form, etc.
+    } catch (err) {
+      alert(err.response?.data?.detail || "Failed to add doctor");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <NavBar />

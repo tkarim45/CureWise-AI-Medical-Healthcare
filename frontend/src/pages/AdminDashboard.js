@@ -305,14 +305,77 @@ const AdminDashboard = () => {
     { id: "doctors", title: "Doctors", icon: <FaUserMd className="text-2xl text-green-500" />, count: doctors.length, bgColor: "bg-green-50", action: () => setActiveSection("doctors") },
   ];
 
-  const handleDepartmentSubmit = (e) => {
-    e.preventDefault();
-    // Add your department submit logic here
+  // Add doctor delete handler
+  const handleDeleteDoctor = async (doctorId) => {
+    if (!window.confirm("Are you sure you want to delete this doctor?")) return;
+    try {
+      await fetch(`${API_URL}/api/doctors/${doctorId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setDoctors((prev) => prev.filter((d) => d.user_id !== doctorId));
+    } catch (err) {
+      alert("Failed to delete doctor");
+    }
   };
 
-  const handleDoctorSubmit = (e) => {
+  // Update handleDoctorSubmit to POST to /api/doctors
+  const handleDoctorSubmit = async (e) => {
     e.preventDefault();
-    // Add your doctor submit logic here
+    try {
+      const payload = { ...doctorForm, hospital_id: hospital.id };
+      const res = await fetch(`${API_URL}/api/doctors`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        alert(data.detail || "Failed to add doctor");
+        return;
+      }
+      // Refetch doctors
+      const doctorResponse = await fetch(`${API_URL}/api/doctors`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const doctorData = await doctorResponse.json();
+      setDoctors(doctorData);
+      setActiveSection("doctors");
+    } catch (err) {
+      alert("Failed to add doctor");
+    }
+  };
+
+  // Add department submit handler
+  const handleDepartmentSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await fetch(`${API_URL}/api/departments`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(departmentForm),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        alert(data.detail || "Failed to add department");
+        return;
+      }
+      // Refetch departments
+      const departmentResponse = await fetch(`${API_URL}/api/departments`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const departmentData = await departmentResponse.json();
+      setDepartments(departmentData);
+      setActiveSection("departments");
+    } catch (err) {
+      alert("Failed to add department");
+    }
   };
 
   return (
@@ -388,10 +451,22 @@ const AdminDashboard = () => {
             <motion.div variants={containerVariants} initial="hidden" animate="visible" className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
               <h2 className="text-xl font-bold mb-4">Assigned Hospital</h2>
               <div className="space-y-2">
-                <p><strong>Name:</strong> {hospital.name}</p>
-                <p><strong>Address:</strong> {hospital.address}</p>
-                {hospital.lat && <p><strong>Latitude:</strong> {hospital.lat}</p>}
-                {hospital.lng && <p><strong>Longitude:</strong> {hospital.lng}</p>}
+                <p>
+                  <strong>Name:</strong> {hospital.name}
+                </p>
+                <p>
+                  <strong>Address:</strong> {hospital.address}
+                </p>
+                {hospital.lat && (
+                  <p>
+                    <strong>Latitude:</strong> {hospital.lat}
+                  </p>
+                )}
+                {hospital.lng && (
+                  <p>
+                    <strong>Longitude:</strong> {hospital.lng}
+                  </p>
+                )}
               </div>
             </motion.div>
           )}
@@ -407,7 +482,10 @@ const AdminDashboard = () => {
                     </div>
                     <input type="text" placeholder="Search departments..." className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
                   </div>
-                  <button className="flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors" onClick={() => setActiveSection("add-department")}> <FaPlus className="mr-2" /> Add Department </button>
+                  <button className="flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors" onClick={() => setActiveSection("add-department")}>
+                    {" "}
+                    <FaPlus className="mr-2" /> Add Department{" "}
+                  </button>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="min-w-full divide-y divide-gray-200">
@@ -430,8 +508,12 @@ const AdminDashboard = () => {
                     Showing <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}</span> to <span className="font-medium">{Math.min(currentPage * itemsPerPage, filteredDepartments.length)}</span> of <span className="font-medium">{filteredDepartments.length}</span> results
                   </div>
                   <div className="flex space-x-2">
-                    <button onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1} className="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50">Previous</button>
-                    <button onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages(filteredDepartments)))} disabled={currentPage === totalPages(filteredDepartments)} className="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50">Next</button>
+                    <button onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1} className="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50">
+                      Previous
+                    </button>
+                    <button onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages(filteredDepartments)))} disabled={currentPage === totalPages(filteredDepartments)} className="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50">
+                      Next
+                    </button>
                   </div>
                 </div>
               </motion.div>
@@ -447,8 +529,12 @@ const AdminDashboard = () => {
                 {departmentMessage && <p className="text-green-500 text-sm">{departmentMessage}</p>}
                 {departmentError && <p className="text-red-500 text-sm">{departmentError}</p>}
                 <div className="flex justify-end space-x-2">
-                  <button type="button" className="px-4 py-2 bg-gray-200 rounded" onClick={() => setActiveSection("departments")}>Cancel</button>
-                  <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded">Add</button>
+                  <button type="button" className="px-4 py-2 bg-gray-200 rounded" onClick={() => setActiveSection("departments")}>
+                    Cancel
+                  </button>
+                  <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded">
+                    Add
+                  </button>
                 </div>
               </form>
             </motion.div>
@@ -465,7 +551,10 @@ const AdminDashboard = () => {
                     </div>
                     <input type="text" placeholder="Search doctors..." className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
                   </div>
-                  <button className="flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors" onClick={() => setActiveSection("create-doctor")}> <FaPlus className="mr-2" /> Add Doctor </button>
+                  <button className="flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors" onClick={() => setActiveSection("create-doctor")}>
+                    {" "}
+                    <FaPlus className="mr-2" /> Add Doctor{" "}
+                  </button>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="min-w-full divide-y divide-gray-200">
@@ -478,6 +567,7 @@ const AdminDashboard = () => {
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bio</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
@@ -490,6 +580,11 @@ const AdminDashboard = () => {
                           <td className="px-6 py-4 whitespace-nowrap">{doc.title}</td>
                           <td className="px-6 py-4 whitespace-nowrap">{doc.phone || "N/A"}</td>
                           <td className="px-6 py-4 whitespace-nowrap">{doc.bio || "N/A"}</td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <button className="text-red-600 hover:text-red-900" onClick={() => handleDeleteDoctor(doc.user_id)}>
+                              Delete
+                            </button>
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -500,8 +595,12 @@ const AdminDashboard = () => {
                     Showing <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}</span> to <span className="font-medium">{Math.min(currentPage * itemsPerPage, filteredDoctors.length)}</span> of <span className="font-medium">{filteredDoctors.length}</span> results
                   </div>
                   <div className="flex space-x-2">
-                    <button onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1} className="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50">Previous</button>
-                    <button onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages(filteredDoctors)))} disabled={currentPage === totalPages(filteredDoctors)} className="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50">Next</button>
+                    <button onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1} className="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50">
+                      Previous
+                    </button>
+                    <button onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages(filteredDoctors)))} disabled={currentPage === totalPages(filteredDoctors)} className="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50">
+                      Next
+                    </button>
                   </div>
                 </div>
               </motion.div>
@@ -516,7 +615,9 @@ const AdminDashboard = () => {
                 <select value={doctorForm.department_id} onChange={(e) => setDoctorForm({ ...doctorForm, department_id: e.target.value })} className="w-full border rounded p-2" required>
                   <option value="">Select Department</option>
                   {departments.map((dept) => (
-                    <option key={dept.id} value={dept.id}>{dept.name}</option>
+                    <option key={dept.id} value={dept.id}>
+                      {dept.name}
+                    </option>
                   ))}
                 </select>
                 <input type="text" className="w-full border rounded p-2" placeholder="Username" value={doctorForm.username} onChange={(e) => setDoctorForm({ ...doctorForm, username: e.target.value })} required />
@@ -529,8 +630,12 @@ const AdminDashboard = () => {
                 {doctorMessage && <p className="text-green-500 text-sm">{doctorMessage}</p>}
                 {doctorError && <p className="text-red-500 text-sm">{doctorError}</p>}
                 <div className="flex justify-end space-x-2">
-                  <button type="button" className="px-4 py-2 bg-gray-200 rounded" onClick={() => setActiveSection("doctors")}>Cancel</button>
-                  <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded">Create</button>
+                  <button type="button" className="px-4 py-2 bg-gray-200 rounded" onClick={() => setActiveSection("doctors")}>
+                    Cancel
+                  </button>
+                  <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded">
+                    Create
+                  </button>
                 </div>
               </form>
             </motion.div>
