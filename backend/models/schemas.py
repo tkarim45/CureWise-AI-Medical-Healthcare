@@ -110,6 +110,8 @@ class DoctorResponse(BaseModel):
     username: Optional[str] = None
     email: Optional[str] = None
     department_name: Optional[str] = None
+    hospital_id: Optional[str] = None  # New: included in doctor response
+    hospital_name: Optional[str] = None  # New: included in doctor response
 
 
 class AvailabilityCreate(BaseModel):
@@ -152,10 +154,10 @@ class AppointmentResponse(BaseModel):
 
 
 class DoctorCreate(BaseModel):
-    department_id: str
     username: str
     email: str
     password: str
+    department_id: str
     specialty: str
     title: str
     phone: Optional[str] = None
@@ -163,6 +165,7 @@ class DoctorCreate(BaseModel):
     license_number: Optional[str] = None
     years_experience: Optional[int] = None
     education: Optional[str] = None
+    hospital_id: Optional[str] = None  # Only required if created by superadmin
 
 
 class MedicalHistoryCreate(BaseModel):
