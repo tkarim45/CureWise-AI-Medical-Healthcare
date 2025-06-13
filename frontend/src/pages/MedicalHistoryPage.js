@@ -117,7 +117,7 @@ const MedicalHistoryPage = () => {
                   </h2>
                   <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                      <label className="block text-gray-700 font-medium mb-2 flex items-center">
+                      <label className="text-gray-700 font-medium mb-2 flex items-center">
                         <MdSick className="text-blue-500 mr-2" />
                         Medical Conditions
                       </label>
@@ -126,7 +126,7 @@ const MedicalHistoryPage = () => {
                     </div>
 
                     <div>
-                      <label className="block text-gray-700 font-medium mb-2 flex items-center">
+                      <label className="text-gray-700 font-medium mb-2 flex items-center">
                         <MdAllInclusive className="text-blue-500 mr-2" />
                         Allergies
                       </label>
@@ -135,7 +135,7 @@ const MedicalHistoryPage = () => {
                     </div>
 
                     <div>
-                      <label className="block text-gray-700 font-medium mb-2 flex items-center">
+                      <label className="text-gray-700 font-medium mb-2 flex items-center">
                         <MdDescription className="text-blue-500 mr-2" />
                         Additional Notes
                       </label>

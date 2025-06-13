@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import NavBar from "../components/layout/NavBar";
 import { useAuth } from "../context/AuthContext";
-import { motion, AnimatePresence } from "framer-motion";
-import { FaHeartbeat, FaWeight, FaTint, FaChartLine, FaRunning, FaBed, FaAppleAlt, FaWater, FaFireAlt } from "react-icons/fa";
-import { IoMdTrendingUp, IoMdTrendingDown, IoMdWater, IoMdTime } from "react-icons/io";
-import { BsDropletHalf, BsArrowUpRight, BsArrowDownRight, BsLightningFill } from "react-icons/bs";
+import { motion } from "framer-motion";
+import { FaHeartbeat, FaWeight, FaTint, FaChartLine, FaRunning, FaBed, FaAppleAlt } from "react-icons/fa";
+import { IoMdTrendingUp, IoMdTrendingDown } from "react-icons/io";
+import { BsDropletHalf, BsLightningFill } from "react-icons/bs";
 import { FiAlertTriangle } from "react-icons/fi";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadialBarChart, RadialBar, PolarAngleAxis } from "recharts";
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { NavLink, useNavigate, useLocation, Link } from "react-router-dom";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../../context/AuthContext";
 import { FaHome, FaInfoCircle, FaBlog, FaDollarSign, FaSignOutAlt, FaHeartbeat, FaUser, FaChevronDown, FaChevronUp } from "react-icons/fa";
@@ -209,28 +209,28 @@ const NavBar = () => {
           <motion.div className="md:hidden bg-white border-t border-gray-200" variants={menuVariants} initial="hidden" animate="visible" exit="exit">
             <motion.div className="pt-2 pb-3 space-y-1 px-4">
               <motion.div variants={itemVariants}>
-                <NavLink to="/" className={({ isActive }) => `block pl-3 pr-4 py-2 rounded-md text-base font-medium flex items-center ${isActive ? "text-primary bg-primary/10" : "text-gray-700 hover:text-primary hover:bg-gray-50"}`} onClick={() => setIsMobileMenuOpen(false)}>
+                <NavLink to="/" className={({ isActive }) => `pl-3 pr-4 py-2 rounded-md text-base font-medium flex items-center ${isActive ? "text-primary bg-primary/10" : "text-gray-700 hover:text-primary hover:bg-gray-50"}`} onClick={() => setIsMobileMenuOpen(false)}>
                   <FaHome className="mr-3" />
                   Home
                 </NavLink>
               </motion.div>
 
               <motion.div variants={itemVariants}>
-                <NavLink to="/about" className={({ isActive }) => `block pl-3 pr-4 py-2 rounded-md text-base font-medium flex items-center ${isActive ? "text-primary bg-primary/10" : "text-gray-700 hover:text-primary hover:bg-gray-50"}`} onClick={() => setIsMobileMenuOpen(false)}>
+                <NavLink to="/about" className={({ isActive }) => `pl-3 pr-4 py-2 rounded-md text-base font-medium flex items-center ${isActive ? "text-primary bg-primary/10" : "text-gray-700 hover:text-primary hover:bg-gray-50"}`} onClick={() => setIsMobileMenuOpen(false)}>
                   <FaInfoCircle className="mr-3" />
                   About
                 </NavLink>
               </motion.div>
 
               <motion.div variants={itemVariants}>
-                <NavLink to="/blog" className={({ isActive }) => `block pl-3 pr-4 py-2 rounded-md text-base font-medium flex items-center ${isActive ? "text-primary bg-primary/10" : "text-gray-700 hover:text-primary hover:bg-gray-50"}`} onClick={() => setIsMobileMenuOpen(false)}>
+                <NavLink to="/blog" className={({ isActive }) => `pl-3 pr-4 py-2 rounded-md text-base font-medium flex items-center ${isActive ? "text-primary bg-primary/10" : "text-gray-700 hover:text-primary hover:bg-gray-50"}`} onClick={() => setIsMobileMenuOpen(false)}>
                   <FaBlog className="mr-3" />
                   Blog
                 </NavLink>
               </motion.div>
 
               <motion.div variants={itemVariants}>
-                <NavLink to="/pricing" className={({ isActive }) => `block pl-3 pr-4 py-2 rounded-md text-base font-medium flex items-center ${isActive ? "text-primary bg-primary/10" : "text-gray-700 hover:text-primary hover:bg-gray-50"}`} onClick={() => setIsMobileMenuOpen(false)}>
+                <NavLink to="/pricing" className={({ isActive }) => `pl-3 pr-4 py-2 rounded-md text-base font-medium flex items-center ${isActive ? "text-primary bg-primary/10" : "text-gray-700 hover:text-primary hover:bg-gray-50"}`} onClick={() => setIsMobileMenuOpen(false)}>
                   <FaDollarSign className="mr-3" />
                   Pricing
                 </NavLink>
