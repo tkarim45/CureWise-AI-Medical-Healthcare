@@ -250,6 +250,8 @@ const AdminDashboard = () => {
   const [doctorMessage] = useState("");
   const [departmentError] = useState("");
   const [doctorError] = useState("");
+  // Add recent activity state (placeholder, replace with real data as needed)
+  const [recentActivity] = useState(["Added department: Cardiology", "Doctor Dr. Smith created", "Updated hospital info", "Deleted department: Pediatrics", "Doctor Dr. Lee profile updated", "Doctor Dr. Jane removed", "Department 'Neurology' added"]);
 
   // Fetch hospital, departments, and doctors
   useEffect(() => {
@@ -442,6 +444,32 @@ const AdminDashboard = () => {
                     </div>
                   </motion.div>
                 ))}
+              </div>
+              {/* Professional Recent Activity Section */}
+              <div className="bg-gradient-to-br from-blue-50 to-white rounded-xl shadow border border-gray-100 p-6 mt-6">
+                <h2 className="text-lg font-bold mb-4 text-gray-800 flex items-center">
+                  <span className="inline-block w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+                  Recent Activity
+                </h2>
+                <ul className="divide-y divide-gray-100">
+                  {recentActivity && recentActivity.length > 0 ? (
+                    recentActivity.slice(0, 7).map((activity, idx) => (
+                      <li key={idx} className="py-3 flex items-start group hover:bg-blue-50 rounded-lg transition">
+                        <div className="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 flex items-center justify-center rounded-full mr-3 shadow-sm">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3" />
+                          </svg>
+                        </div>
+                        <div className="flex-1">
+                          <span className="text-gray-800 font-medium">{activity}</span>
+                          <div className="text-xs text-gray-400 mt-1">Just now</div>
+                        </div>
+                      </li>
+                    ))
+                  ) : (
+                    <li className="py-3 text-gray-400 text-center">No recent activity.</li>
+                  )}
+                </ul>
               </div>
             </motion.div>
           )}
@@ -642,7 +670,6 @@ const AdminDashboard = () => {
           )}
         </main>
       </div>
-      <Footer />
     </div>
   );
 };
