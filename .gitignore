@@ -7,8 +7,6 @@ backend/models/__pycache__
 backend/routes/__pycache__
 Screenshot 2025-05-15 at 4.25.44 PM.png
 
-backend/notebooks
-
 backend/utils/.env
 
 backend/models/.DS_Store
