@@ -242,3 +242,11 @@ class UserProfileUpdate(BaseModel):
     date_of_birth: Optional[str] = None  # ISO format string
     gender: Optional[str] = None
     address: Optional[str] = None
+
+
+class MedicalHistorySummaryRequest(BaseModel):
+    user_id: str
+
+
+class MedicalHistorySummaryResponse(BaseModel):
+    summary: str

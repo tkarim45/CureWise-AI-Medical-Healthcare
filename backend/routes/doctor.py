@@ -8,6 +8,7 @@ from models.schemas import (
     DepartmentResponse,
     AppointmentResponse,
     MedicalHistoryResponse,
+    MedicalHistorySummaryResponse,
     DoctorCreate,
     DoctorResponse,
     TimeSlotResponse,
@@ -103,9 +104,9 @@ async def get_todays_appointments(current_user: dict = Depends(get_current_user)
             doctor_username=row[5],
             department_id=row[6],
             department_name=row[7],
-            appointment_date=row[8],
-            start_time=row[9],
-            end_time=row[10],
+            appointment_date=str(row[8]),
+            start_time=str(row[9]),
+            end_time=str(row[10]),
             status=row[11],
             created_at=str(row[12]),
             hospital_id=row[13],
@@ -164,9 +165,9 @@ async def get_weekly_appointments(current_user: dict = Depends(get_current_user)
             doctor_username=row[5],
             department_id=row[6],
             department_name=row[7],
-            appointment_date=row[8],
-            start_time=row[9],
-            end_time=row[10],
+            appointment_date=str(row[8]),
+            start_time=str(row[9]),
+            end_time=str(row[10]),
             status=row[11],
             created_at=str(row[12]),
             hospital_id=row[13],
@@ -503,14 +504,14 @@ async def get_doctor_slots(
     # Get available slots for the doctor on the given day
     c.execute(
         """
-        SELECT da.start_time, da.end_time
+        SELECT DISTINCT da.start_time, da.end_time
         FROM doctor_availability da
         WHERE da.user_id = %s AND da.day_of_week = %s
         AND NOT EXISTS (
             SELECT 1 FROM appointments a
             WHERE a.doctor_id = da.user_id
             AND a.appointment_date = %s
-            AND a.start_time = da.start_time
+            AND a.start_time = da.start_time::time
             AND a.status != 'cancelled'
         )
         ORDER BY da.start_time
@@ -602,3 +603,150 @@ async def delete_doctor(doctor_id: str, current_user: dict = Depends(get_current
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
     finally:
         conn.close()
+
+
+@router.get(
+    "/api/doctor/appointments/next-week", response_model=List[AppointmentResponse]
+)
+async def get_next_week_appointments(current_user: dict = Depends(get_current_user)):
+    if current_user["role"] != "doctor":
+        raise HTTPException(status_code=403, detail="Not authorized")
+
+    # Calculate the start (Monday) and end (Sunday) of the next week
+    today = date.today()
+    start_of_next_week = (
+        today - timedelta(days=today.weekday()) + timedelta(days=7)
+    )  # Next Monday
+    end_of_next_week = start_of_next_week + timedelta(days=6)  # Next Sunday
+    start_date = start_of_next_week.isoformat()
+    end_date = end_of_next_week.isoformat()
+
+    conn = psycopg2.connect(
+        dbname=settings.DB_NAME,
+        user=settings.DB_USER,
+        password=settings.DB_PASSWORD,
+        host=settings.DB_HOST,
+        port=settings.DB_PORT,
+    )
+    c = conn.cursor()
+    c.execute(
+        """
+        SELECT a.id, a.user_id, u.username, u.email, a.doctor_id, du.username, a.department_id,
+               d.name, a.appointment_date, a.start_time, a.end_time, a.status, a.created_at,
+               a.hospital_id
+        FROM appointments a
+        JOIN users u ON a.user_id = u.id
+        JOIN users du ON a.doctor_id = du.id
+        JOIN departments d ON a.department_id = d.id
+        WHERE a.doctor_id = %s 
+        AND a.appointment_date BETWEEN %s AND %s 
+        AND a.status != 'cancelled'
+        ORDER BY a.appointment_date, a.start_time
+        """,
+        (current_user["user_id"], start_date, end_date),
+    )
+    appointments = [
+        AppointmentResponse(
+            id=row[0],
+            user_id=row[1],
+            username=row[2],
+            email=row[3],
+            doctor_id=row[4],
+            doctor_username=row[5],
+            department_id=row[6],
+            department_name=row[7],
+            appointment_date=str(row[8]),
+            start_time=str(row[9]),
+            end_time=str(row[10]),
+            status=row[11],
+            created_at=str(row[12]),
+            hospital_id=row[13],
+        )
+        for row in c.fetchall()
+    ]
+    conn.close()
+
+    logger.info(
+        f"Fetched next week's appointments for doctor {current_user['user_id']} from {start_date} to {end_date}"
+    )
+    return appointments
+
+
+@router.post(
+    "/api/doctor/patient/{user_id}/history/summary",
+    response_model=MedicalHistorySummaryResponse,
+)
+async def summarize_patient_history(
+    user_id: str, current_user: dict = Depends(get_current_user)
+):
+    if current_user["role"] != "doctor":
+        raise HTTPException(status_code=403, detail="Not authorized")
+
+    # Verify doctor has an appointment with this patient
+    conn = psycopg2.connect(
+        dbname=settings.DB_NAME,
+        user=settings.DB_USER,
+        password=settings.DB_PASSWORD,
+        host=settings.DB_HOST,
+        port=settings.DB_PORT,
+    )
+    c = conn.cursor()
+    c.execute(
+        """
+        SELECT id FROM appointments
+        WHERE doctor_id = %s AND user_id = %s AND status != 'cancelled'
+        """,
+        (current_user["user_id"], user_id),
+    )
+    if not c.fetchone():
+        conn.close()
+        raise HTTPException(
+            status_code=403, detail="No active appointments with this patient"
+        )
+
+    c.execute(
+        """
+        SELECT conditions, allergies, notes, updated_at, updated_by
+        FROM medical_history
+        WHERE user_id = %s
+        ORDER BY updated_at DESC
+        """,
+        (user_id,),
+    )
+    history = c.fetchall()
+    conn.close()
+
+    # Compose a summary string
+    history_text = "\n".join(
+        [
+            f"Conditions: {row[0] or 'None'} | Allergies: {row[1] or 'None'} | Notes: {row[2] or 'None'} | Updated: {row[3]} | By: {row[4]}"
+            for row in history
+        ]
+    )
+    if not history_text:
+        history_text = "No medical history available."
+
+    # Use LLM to summarize
+    from utils.agents import llm
+
+    prompt = f"Summarize the following medical history for a doctor in a concise, clinically useful way.\n\n{history_text}"
+    summary = llm.invoke(prompt)
+    # If summary is an object (e.g., AIMessage), extract the string content
+    if hasattr(summary, "content"):
+        summary = summary.content
+    return {"summary": summary}
+
+
+@router.get("/api/health-analytics", response_model=dict)
+async def get_health_analytics(current_user: dict = Depends(get_current_user)):
+    # Example: Fetch from real tables in production
+    # Here, return mock data for demo
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    # You can fetch real analytics from DB here
+    return {
+        "heartRate": 72,
+        "weight": 68,
+        "bloodSugar": 95,
+        "trends": [70, 72, 74, 73, 71, 72, 72],
+    }
