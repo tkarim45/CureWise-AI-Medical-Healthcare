@@ -1,6 +1,6 @@
-# HealthSync-AI: LLM & AI-Powered Healthcare Data Platform
+# CureWise-AI: LLM & AI-Powered Healthcare Data Platform
 
-**HealthSync-AI** is a modern, production-grade healthcare data platform that leverages Large Language Models (LLMs), Retrieval-Augmented Generation (RAG), and advanced AI/ML techniques to deliver intelligent analytics, medical report parsing, and conversational AI for hospitals, doctors, and patients.
+**CureWise-AI** is a modern, production-grade healthcare data platform that leverages Large Language Models (LLMs), Retrieval-Augmented Generation (RAG), and advanced AI/ML techniques to deliver intelligent analytics, medical report parsing, and conversational AI for hospitals, doctors, and patients.
 
 ---
 
@@ -19,7 +19,7 @@
 
 ## Project Overview
 
-HealthSync-AI brings together LLMs, RAG, and healthcare data engineering to provide:
+CureWise-AI brings together LLMs, RAG, and healthcare data engineering to provide:
 
 - **Conversational AI** for medical queries, appointment booking, and patient support.
 - **Automated parsing and structuring** of medical documents (e.g., blood reports) using LLMs.
@@ -108,8 +108,8 @@ backend/
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/tkarim45/HealthSync-AI.git
-cd healthsync-ai
+git clone https://github.com/tkarim45/CureWise-AI-Medical-Healthcare.git
+cd CureWise-AI-Medical-Healthcare
 ```
 
 ### 2. Docker Setup
