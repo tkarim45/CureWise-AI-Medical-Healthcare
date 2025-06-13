@@ -25,14 +25,14 @@ const DashboardPage = () => {
     {
       title: "Appointments",
       icon: <FaCalendarAlt className="text-2xl" />,
-      path: "/appointments",
+      path: "/book-appointment",
       color: "bg-purple-400 bg-opacity-50 text-purple-900",
       description: "Schedule and manage doctor visits",
     },
     {
       title: "Health Analytics",
       icon: <IoMdAnalytics className="text-2xl" />,
-      path: "/analytics",
+      path: "/health-analytics",
       color: "bg-teal-400 bg-opacity-50 text-teal-900",
       description: "Track your health metrics over time",
     },
@@ -141,7 +141,7 @@ const DashboardPage = () => {
           {isSidebarOpen && (
             <motion.aside initial={{ x: -300, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -300, opacity: 0 }} transition={{ type: "spring", stiffness: 300, damping: 30 }} className="hidden md:block w-72 bg-white shadow-lg p-6 fixed h-[calc(100vh-80px)] overflow-y-auto">
               <div className="mb-10">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">HealthSync AI</h2>
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">CureWise</h2>
                 <div className="space-y-4">
                   <button onClick={() => setActiveSection("dashboard")} className={`w-full flex items-center p-4 rounded-xl text-lg font-medium transition-all ${activeSection === "dashboard" ? "bg-blue-100 text-blue-700 shadow-sm" : "text-gray-700 hover:bg-gray-50"}`}>
                     <RiDashboardLine className="mr-4 text-xl" />
@@ -238,6 +238,27 @@ const DashboardPage = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                   {aiDetectionFeatures.map((feature, index) => (
                     <motion.div key={feature.path} custom={index + healthFeatures.length} variants={cardVariants} initial="hidden" animate="visible" whileHover="hover" onClick={() => navigate(feature.path)} className="bg-white p-8 rounded-2xl shadow-md border border-gray-100 cursor-pointer hover:shadow-lg transition-all">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <div className={`p-4 rounded-full ${feature.color} mb-4`}>{feature.icon}</div>
+                          <h3 className="text-xl font-bold text-gray-900">{feature.title}</h3>
+                          <p className="text-sm text-gray-500 mt-2">{feature.description}</p>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Support Section */}
+              <div>
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-bold text-gray-900">Support & Assistance</h2>
+                  <button className="text-sm font-semibold text-blue-600 hover:text-blue-800">Get Help</button>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                  {supportFeatures.map((feature, index) => (
+                    <motion.div key={feature.path} custom={index + healthFeatures.length + aiDetectionFeatures.length} variants={cardVariants} initial="hidden" animate="visible" whileHover="hover" onClick={() => navigate(feature.path)} className="bg-white p-8 rounded-2xl shadow-md border border-gray-100 cursor-pointer hover:shadow-lg transition-all">
                       <div className="flex justify-between items-start">
                         <div>
                           <div className={`p-4 rounded-full ${feature.color} mb-4`}>{feature.icon}</div>

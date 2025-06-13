@@ -2,8 +2,7 @@ import { useState, useEffect } from "react";
 import { NavLink, useNavigate, useLocation, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../../context/AuthContext";
-import { FaHome, FaInfoCircle, FaBlog, FaDollarSign, FaSignInAlt, FaSignOutAlt, FaHeartbeat, FaUser, FaChevronDown, FaChevronUp } from "react-icons/fa";
-import { IoMdNotificationsOutline } from "react-icons/io";
+import { FaHome, FaInfoCircle, FaBlog, FaDollarSign, FaSignOutAlt, FaHeartbeat, FaUser, FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { RiDashboardLine } from "react-icons/ri";
 
 const NavBar = () => {
@@ -141,9 +140,9 @@ const NavBar = () => {
           <div className="hidden md:flex md:items-center md:space-x-4">
             {user ? (
               <>
-                <button className="p-2 rounded-full text-gray-600 hover:text-primary hover:bg-gray-100">
-                  <IoMdNotificationsOutline className="h-5 w-5" />
-                  <span className="sr-only">Notifications</span>
+                <button className="p-2 rounded-full text-gray-600 hover:text-primary hover:bg-gray-100 flex items-center" onClick={handleDashboardClick}>
+                  <RiDashboardLine className="h-5 w-5" />
+                  <span className="sr-only">Dashboard</span>
                 </button>
 
                 <div className="relative ml-4">

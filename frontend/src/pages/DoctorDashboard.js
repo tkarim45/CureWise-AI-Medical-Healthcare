@@ -3,6 +3,9 @@ import { motion } from "framer-motion";
 import NavBar from "../components/layout/NavBar";
 import { useAuth } from "../context/AuthContext";
 import { FaBuilding, FaCalendar, FaUserMd, FaClock, FaChevronRight } from "react-icons/fa";
+import { FaFileMedical } from "react-icons/fa";
+
+const API_URL = process.env.REACT_APP_API_URL;
 
 // Main Dashboard Component
 const DoctorDashboard = () => {
@@ -11,17 +14,20 @@ const DoctorDashboard = () => {
   const [department, setDepartment] = useState(null);
   const [todayAppointments, setTodayAppointments] = useState([]);
   const [weekAppointments, setWeekAppointments] = useState([]);
+  const [nextWeekAppointments, setNextWeekAppointments] = useState([]);
   const [viewMode, setViewMode] = useState("today");
   const [availability, setAvailability] = useState([]);
   const [recentActivity] = useState(["Completed appointment with John Doe", "Updated availability for Friday", "Reviewed medical history for Jane Smith", "Added notes for patient Ali Khan", "Completed appointment with Sara Lee", "Changed status of appointment with Mike Ross", "Updated profile information"]);
   const [expandedAppointmentId, setExpandedAppointmentId] = useState(null);
+  const [summaryLoadingId, setSummaryLoadingId] = useState(null);
+  const [summaryData, setSummaryData] = useState({});
 
   // Fetch department, appointments, and availability
   useEffect(() => {
     const fetchData = async () => {
       try {
         // Fetch department
-        const departmentResponse = await fetch("http://localhost:8000/api/doctor/department", {
+        const departmentResponse = await fetch(`${API_URL}/api/doctor/department`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const departmentData = await departmentResponse.json();
@@ -32,7 +38,7 @@ const DoctorDashboard = () => {
         }
 
         // Fetch today's appointments
-        const todayResponse = await fetch("http://localhost:8000/api/doctor/appointments/today", {
+        const todayResponse = await fetch(`${API_URL}/api/doctor/appointments/today`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const todayData = await todayResponse.json();
@@ -43,7 +49,7 @@ const DoctorDashboard = () => {
         }
 
         // Fetch week's appointments
-        const weekResponse = await fetch("http://localhost:8000/api/doctor/appointments/week", {
+        const weekResponse = await fetch(`${API_URL}/api/doctor/appointments/week`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const weekData = await weekResponse.json();
@@ -53,10 +59,21 @@ const DoctorDashboard = () => {
           console.error("Failed to fetch week's appointments:", weekData.detail);
         }
 
+        // Fetch next week's appointments
+        const nextWeekResponse = await fetch(`${API_URL}/api/doctor/appointments/next-week`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const nextWeekData = await nextWeekResponse.json();
+        if (nextWeekResponse.ok) {
+          setNextWeekAppointments(nextWeekData);
+        } else {
+          console.error("Failed to fetch next week's appointments:", nextWeekData.detail);
+        }
+
         // Fetch availability (for today as example)
         if (user?.user_id) {
           const today = new Date().toISOString().slice(0, 10);
-          const res = await fetch(`http://localhost:8000/api/doctor/${user.user_id}/slots?date=${today}`, {
+          const res = await fetch(`${API_URL}/api/doctor/${user.user_id}/slots?date=${today}`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           if (res.ok) {
@@ -231,91 +248,128 @@ const DoctorDashboard = () => {
                 <button onClick={() => setViewMode("week")} className={`px-4 py-2 rounded-md font-semibold border transition-colors duration-150 ${viewMode === "week" ? "bg-blue-600 text-white border-blue-600" : "bg-white text-blue-600 border-blue-300 hover:bg-blue-50"}`}>
                   This Week's Appointments
                 </button>
+                <button onClick={() => setViewMode("nextWeek")} className={`px-4 py-2 rounded-md font-semibold border transition-colors duration-150 ${viewMode === "nextWeek" ? "bg-blue-600 text-white border-blue-600" : "bg-white text-blue-600 border-blue-300 hover:bg-blue-50"}`}>
+                  Next Week's Appointments
+                </button>
               </div>
               <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                <h2 className="text-lg font-bold mb-4">{viewMode === "today" ? "Today's Appointments" : "This Week's Appointments"}</h2>
-                {(viewMode === "today" ? todayAppointments : weekAppointments).length === 0 ? (
-                  <p className="text-gray-600">No appointments scheduled.</p>
-                ) : (
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patient</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Medical History</th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {(viewMode === "today" ? todayAppointments : weekAppointments).map((appt) => [
-                        <tr key={appt.id} className="hover:bg-blue-50 cursor-pointer transition-colors">
-                          <td className="px-6 py-4 whitespace-nowrap">{appt.username}</td>
-                          <td className="px-6 py-4 whitespace-nowrap">{appt.email}</td>
-                          <td className="px-6 py-4 whitespace-nowrap">{appt.appointment_date}</td>
-                          <td className="px-6 py-4 whitespace-nowrap">{`${appt.start_time} - ${appt.end_time}`}</td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${appt.status === "completed" ? "bg-green-100 text-green-800" : appt.status === "cancelled" ? "bg-red-100 text-red-800" : "bg-blue-100 text-blue-800"}`}>{appt.status}</span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <button
-                              className="text-primary-600 hover:underline font-medium"
-                              onClick={async () => {
-                                if (!appt._history) {
-                                  const res = await fetch(`http://localhost:8000/api/doctor/patient/${appt.user_id}/history`, {
-                                    headers: { Authorization: `Bearer ${token}` },
-                                  });
-                                  const data = await res.json();
-                                  appt._history = data;
-                                  setTodayAppointments((prev) => prev.map((a) => (a.id === appt.id ? { ...a, _history: data } : a)));
-                                  setWeekAppointments((prev) => prev.map((a) => (a.id === appt.id ? { ...a, _history: data } : a)));
-                                }
-                                setExpandedAppointmentId(appt.id === expandedAppointmentId ? null : appt.id);
-                              }}
-                            >
-                              {expandedAppointmentId === appt.id ? "Hide" : "View"}
-                            </button>
-                          </td>
-                        </tr>,
-                        expandedAppointmentId === appt.id && (
-                          <tr key={appt.id + "-history"}>
-                            <td colSpan="6" className="bg-primary-50 px-6 py-4">
-                              <div>
-                                <h3 className="font-semibold text-primary-700 mb-2">Medical History for {appt.username}</h3>
-                                {appt._history && appt._history.length > 0 ? (
-                                  <ul className="space-y-2">
-                                    {appt._history.map((record) => (
-                                      <li key={record.id} className="border-t pt-2">
-                                        <p>
-                                          <strong>Conditions:</strong> {record.conditions || "None"}
-                                        </p>
-                                        <p>
-                                          <strong>Allergies:</strong> {record.allergies || "None"}
-                                        </p>
-                                        <p>
-                                          <strong>Notes:</strong> {record.notes || "None"}
-                                        </p>
-                                        <p>
-                                          <strong>Updated:</strong> {record.updated_at || "N/A"}
-                                        </p>
-                                        <p>
-                                          <strong>By:</strong> {record.updated_by || "N/A"}
-                                        </p>
-                                      </li>
-                                    ))}
-                                  </ul>
-                                ) : (
-                                  <p className="text-gray-500">No medical history available.</p>
-                                )}
-                              </div>
+                <h2 className="text-lg font-bold mb-4">{viewMode === "today" ? "Today's Appointments" : viewMode === "week" ? "This Week's Appointments" : "Next Week's Appointments"}</h2>
+                {(() => {
+                  const appts = viewMode === "today" ? todayAppointments : viewMode === "week" ? weekAppointments : nextWeekAppointments;
+                  return appts.length === 0 ? (
+                    <p className="text-gray-600">No appointments scheduled.</p>
+                  ) : (
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patient</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Medical History</th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {appts.map((appt) => [
+                          <tr key={appt.id} className="hover:bg-blue-50 cursor-pointer transition-colors">
+                            <td className="px-6 py-4 whitespace-nowrap">{appt.username}</td>
+                            <td className="px-6 py-4 whitespace-nowrap">{appt.email}</td>
+                            <td className="px-6 py-4 whitespace-nowrap">{appt.appointment_date}</td>
+                            <td className="px-6 py-4 whitespace-nowrap">{`${appt.start_time} - ${appt.end_time}`}</td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${appt.status === "completed" ? "bg-green-100 text-green-800" : appt.status === "cancelled" ? "bg-red-100 text-red-800" : "bg-blue-100 text-blue-800"}`}>{appt.status}</span>
                             </td>
-                          </tr>
-                        ),
-                      ])}
-                    </tbody>
-                  </table>
-                )}
+                            <td className="px-6 py-4 whitespace-nowrap flex items-center gap-2">
+                              <button
+                                className="text-primary-600 hover:underline font-medium"
+                                onClick={async () => {
+                                  if (!appt._history) {
+                                    const res = await fetch(`${API_URL}/api/doctor/patient/${appt.user_id}/history`, {
+                                      headers: { Authorization: `Bearer ${token}` },
+                                    });
+                                    const data = await res.json();
+                                    appt._history = data;
+                                    setTodayAppointments((prev) => prev.map((a) => (a.id === appt.id ? { ...a, _history: data } : a)));
+                                    setWeekAppointments((prev) => prev.map((a) => (a.id === appt.id ? { ...a, _history: data } : a)));
+                                    setNextWeekAppointments((prev) => prev.map((a) => (a.id === appt.id ? { ...a, _history: data } : a)));
+                                  }
+                                  setExpandedAppointmentId(appt.id === expandedAppointmentId ? null : appt.id);
+                                }}
+                              >
+                                {expandedAppointmentId === appt.id ? "Hide" : "View"}
+                              </button>
+                              <button
+                                className={`ml-2 transition-all duration-200 rounded-full p-2 shadow-md border-2 border-blue-200 bg-gradient-to-br from-blue-100 to-blue-300 hover:from-blue-200 hover:to-blue-400 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-400 ${summaryLoadingId === appt.id ? "animate-pulse opacity-60" : ""}`}
+                                title="Summarize Medical History"
+                                onClick={async (e) => {
+                                  e.stopPropagation();
+                                  setSummaryLoadingId(appt.id);
+                                  setSummaryData((prev) => ({ ...prev, [appt.id]: null }));
+                                  try {
+                                    const res = await fetch(`${API_URL}/api/doctor/patient/${appt.user_id}/history/summary`, {
+                                      method: "POST",
+                                      headers: { Authorization: `Bearer ${token}` },
+                                    });
+                                    const data = await res.json();
+                                    setSummaryData((prev) => ({ ...prev, [appt.id]: data.summary }));
+                                  } catch (err) {
+                                    setSummaryData((prev) => ({ ...prev, [appt.id]: "Failed to summarize." }));
+                                  } finally {
+                                    setSummaryLoadingId(null);
+                                  }
+                                }}
+                              >
+                                <FaFileMedical size={20} className="text-blue-700 drop-shadow-md" />
+                              </button>
+                            </td>
+                          </tr>,
+                          expandedAppointmentId === appt.id && (
+                            <tr key={appt.id + "-history"}>
+                              <td colSpan="6" className="bg-primary-50 px-6 py-4">
+                                <div>
+                                  <h3 className="font-semibold text-primary-700 mb-2">Medical History for {appt.username}</h3>
+                                  {summaryLoadingId === appt.id ? (
+                                    <div className="text-blue-600 font-medium">Summarizing...</div>
+                                  ) : summaryData[appt.id] ? (
+                                    <div className="mb-2 p-3 bg-blue-50 border border-blue-200 rounded text-blue-900">
+                                      <strong>Summary:</strong> {summaryData[appt.id]}
+                                    </div>
+                                  ) : null}
+                                  {appt._history && appt._history.length > 0 ? (
+                                    <ul className="space-y-2">
+                                      {appt._history.map((record) => (
+                                        <li key={record.id} className="border-t pt-2">
+                                          <p>
+                                            <strong>Conditions:</strong> {record.conditions || "None"}
+                                          </p>
+                                          <p>
+                                            <strong>Allergies:</strong> {record.allergies || "None"}
+                                          </p>
+                                          <p>
+                                            <strong>Notes:</strong> {record.notes || "None"}
+                                          </p>
+                                          <p>
+                                            <strong>Updated:</strong> {record.updated_at || "N/A"}
+                                          </p>
+                                          <p>
+                                            <strong>By:</strong> {record.updated_by || "N/A"}
+                                          </p>
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  ) : (
+                                    <p className="text-gray-500">No medical history available.</p>
+                                  )}
+                                </div>
+                              </td>
+                            </tr>
+                          ),
+                        ])}
+                      </tbody>
+                    </table>
+                  );
+                })()}
               </div>
             </motion.div>
           )}

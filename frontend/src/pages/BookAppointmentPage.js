@@ -1,141 +1,302 @@
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import NavBar from "../components/layout/NavBar";
 import { useAuth } from "../context/AuthContext";
-import { FaCalendarCheck, FaHeart } from "react-icons/fa";
+import { FaCalendarAlt, FaClock, FaHospital, FaUserMd, FaChevronRight, FaCheckCircle } from "react-icons/fa";
+import { MdDepartureBoard } from "react-icons/md";
 
-// Footer Component (reused from other dashboards)
+const API_URL = process.env.REACT_APP_API_URL;
+
+// Footer Component
 const Footer = () => {
-  const footerVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
-  };
-
   return (
-    <motion.footer className="bg-gray-50 py-6 border-t border-gray-200" initial="hidden" animate="visible" variants={footerVariants}>
-      <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-gray-600">
+    <footer className="bg-white py-6 border-t border-gray-100 mt-12">
+      <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-gray-500">
         <p className="text-sm">© {new Date().getFullYear()} HealthSync AI. All rights reserved.</p>
         <div className="flex items-center space-x-2 mt-2 md:mt-0">
-          <span className="text-sm">Made with</span>
-          <motion.span className="text-teal-500" animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}>
-            <FaHeart />
-          </motion.span>
-          <span className="text-sm">by the HealthSync Team</span>
+          <span className="text-sm">Made with care by the HealthSync Team</span>
         </div>
       </div>
-    </motion.footer>
+    </footer>
   );
 };
 
-// Dynamic Content Component
-const BookAppointmentContent = ({ activeSection, hospitals, departments, doctors, slots, formData, setFormData, message, error, handleSubmit }) => {
-  const contentVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-  };
+// Stepper Component
+const Stepper = ({ currentStep }) => {
+  const steps = [
+    { id: "hospital", label: "Hospital" },
+    { id: "department", label: "Department" },
+    { id: "doctor", label: "Doctor" },
+    { id: "datetime", label: "Date & Time" },
+    { id: "confirm", label: "Confirm" },
+  ];
 
-  const renderContent = () => {
-    switch (activeSection) {
-      case "welcome":
-        return (
-          <motion.div variants={contentVariants} initial="hidden" animate="visible">
-            <p className="text-gray-600">Welcome to the Appointment Booking page. Use the card above to book an appointment with a doctor.</p>
-          </motion.div>
-        );
-      case "book-appointment":
-        return (
-          <motion.div variants={contentVariants} initial="hidden" animate="visible" className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Book an Appointment</h2>
-            <form onSubmit={handleSubmit}>
-              <div className="space-y-4">
-                {/* Hospital Dropdown */}
-                <div>
-                  <label className="block text-gray-700 text-sm font-semibold mb-2">Hospital</label>
-                  <select value={formData.hospital_id} onChange={(e) => setFormData({ ...formData, hospital_id: e.target.value, department_id: "", doctor_id: "", date: "", slot: null })} className="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:border-teal-500" required>
-                    <option value="">Select Hospital</option>
-                    {hospitals.map((hospital) => (
-                      <option key={hospital.id} value={hospital.id}>
-                        {hospital.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+  return (
+    <div className="flex justify-between items-center mb-8 relative">
+      <div className="absolute top-1/2 left-0 right-0 h-1 bg-gray-100 -z-10"></div>
+      {steps.map((step, index) => (
+        <div key={step.id} className="flex flex-col items-center relative">
+          <div className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep >= index + 1 ? "bg-blue-500 text-white" : "bg-gray-100 text-gray-400"}`}>{currentStep > index + 1 ? <FaCheckCircle className="text-sm" /> : index + 1}</div>
+          <span className={`text-xs mt-2 ${currentStep >= index + 1 ? "text-blue-500 font-medium" : "text-gray-400"}`}>{step.label}</span>
+          {index < steps.length - 1 && <div className={`absolute top-4 left-12 w-16 h-1 ${currentStep > index + 1 ? "bg-blue-500" : "bg-gray-100"}`}></div>}
+        </div>
+      ))}
+    </div>
+  );
+};
 
-                {/* Department Dropdown */}
-                <div>
-                  <label className="block text-gray-700 text-sm font-semibold mb-2">Department</label>
-                  <select value={formData.department_id} onChange={(e) => setFormData({ ...formData, department_id: e.target.value, doctor_id: "", date: "", slot: null })} className="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:border-teal-500" required disabled={!formData.hospital_id}>
-                    <option value="">Select Department</option>
-                    {departments.map((dept) => (
-                      <option key={dept.id} value={dept.id}>
-                        {dept.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+// Appointment Booking Form
+const AppointmentForm = ({ hospitals, departments, doctors, slots, formData, setFormData, currentStep, setCurrentStep, message, error, handleSubmit }) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-                {/* Doctor Dropdown */}
-                <div>
-                  <label className="block text-gray-700 text-sm font-semibold mb-2">Doctor</label>
-                  <select value={formData.doctor_id} onChange={(e) => setFormData({ ...formData, doctor_id: e.target.value, date: "", slot: null })} className="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:border-teal-500" required disabled={!formData.department_id}>
-                    <option value="">Select Doctor</option>
-                    {doctors.map((doc) => (
-                      <option key={doc.user_id} value={doc.user_id}>
-                        {doc.username} ({doc.specialty})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Date Picker */}
-                <div>
-                  <label className="block text-gray-700 text-sm font-semibold mb-2">Date</label>
-                  <input type="date" value={formData.date} onChange={(e) => setFormData({ ...formData, date: e.target.value, slot: null })} className="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:border-teal-500" min={new Date().toISOString().split("T")[0]} required disabled={!formData.doctor_id} />
-                </div>
-
-                {/* Time Slots */}
-                <div>
-                  <label className="block text-gray-700 text-sm font-semibold mb-2">Available Time Slots</label>
-                  {formData.date && slots.length > 0 ? (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                      {slots.map((slot, index) => (
-                        <button key={index} type="button" onClick={() => setFormData({ ...formData, slot })} className={`p-2 rounded-lg border ${formData.slot && formData.slot.start_time === slot.start_time ? "bg-teal-500 text-white border-teal-500" : "bg-white border-gray-300 hover:border-teal-500"} text-sm font-semibold`}>
-                          {`${slot.start_time} - ${slot.end_time}`}
-                        </button>
-                      ))}
-                    </div>
-                  ) : formData.date ? (
-                    <p className="text-gray-600">No slots available for this date.</p>
-                  ) : (
-                    <p className="text-gray-600">Select a date to view available slots.</p>
-                  )}
-                </div>
-              </div>
-
-              {message && <p className="text-green-500 text-sm mt-4">{message}</p>}
-              {error && <p className="text-red-500 text-sm mt-4">{error}</p>}
-              <button type="submit" className="mt-6 w-full p-3 bg-teal-500 text-white rounded-lg font-semibold hover:bg-teal-600 disabled:bg-gray-400" disabled={!formData.slot}>
-                Book Appointment
-              </button>
-            </form>
-          </motion.div>
-        );
-      default:
-        return null;
+  const handleNext = () => {
+    if (currentStep < 5) {
+      setCurrentStep(currentStep + 1);
     }
   };
 
-  return <div>{renderContent()}</div>;
+  const handleBack = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    await handleSubmit(e);
+    setIsSubmitting(false);
+  };
+
+  return (
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <Stepper currentStep={currentStep} />
+
+      <form onSubmit={handleFormSubmit} className="p-6">
+        <AnimatePresence mode="wait">
+          {currentStep === 1 && (
+            <motion.div key="step1" initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -50 }} transition={{ duration: 0.3 }} className="space-y-6">
+              <h3 className="text-lg font-semibold text-gray-800 flex items-center">
+                <FaHospital className="text-blue-500 mr-2" />
+                Select Hospital
+              </h3>
+              <div className="space-y-4">
+                {hospitals.map((hospital) => (
+                  <div
+                    key={hospital.id}
+                    className={`p-4 border rounded-lg cursor-pointer transition-all ${formData.hospital_id === hospital.id ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:border-blue-300"}`}
+                    onClick={() => {
+                      setFormData({
+                        ...formData,
+                        hospital_id: hospital.id,
+                        department_id: "",
+                        doctor_id: "",
+                        date: "",
+                        slot: null,
+                      });
+                      handleNext();
+                    }}
+                  >
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <h4 className="font-medium text-gray-800">{hospital.name}</h4>
+                        <p className="text-sm text-gray-500">{hospital.address}</p>
+                      </div>
+                      <FaChevronRight className="text-gray-400" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+          {currentStep === 2 && (
+            <motion.div key="step2" initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -50 }} transition={{ duration: 0.3 }} className="space-y-6">
+              <h3 className="text-lg font-semibold text-gray-800 flex items-center">
+                <MdDepartureBoard className="text-blue-500 mr-2" />
+                Select Department
+              </h3>
+              <div className="space-y-4">
+                {departments.map((dept) => (
+                  <div
+                    key={dept.id}
+                    className={`p-4 border rounded-lg cursor-pointer transition-all ${formData.department_id === dept.id ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:border-blue-300"}`}
+                    onClick={() => {
+                      setFormData({
+                        ...formData,
+                        department_id: dept.id,
+                        doctor_id: "",
+                        date: "",
+                        slot: null,
+                      });
+                      handleNext();
+                    }}
+                  >
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <h4 className="font-medium text-gray-800">{dept.name}</h4>
+                        <p className="text-sm text-gray-500">{dept.description || "General medical services"}</p>
+                      </div>
+                      <FaChevronRight className="text-gray-400" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <button type="button" onClick={handleBack} className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800">
+                Back
+              </button>
+            </motion.div>
+          )}
+
+          {currentStep === 3 && (
+            <motion.div key="step3" initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -50 }} transition={{ duration: 0.3 }} className="space-y-6">
+              <h3 className="text-lg font-semibold text-gray-800 flex items-center">
+                <FaUserMd className="text-blue-500 mr-2" />
+                Select Doctor
+              </h3>
+              <div className="space-y-4">
+                {doctors.map((doc) => (
+                  <div
+                    key={doc.user_id}
+                    className={`p-4 border rounded-lg cursor-pointer transition-all ${formData.doctor_id === doc.user_id ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:border-blue-300"}`}
+                    onClick={() => {
+                      setFormData({
+                        ...formData,
+                        doctor_id: doc.user_id,
+                        date: "",
+                        slot: null,
+                      });
+                      handleNext();
+                    }}
+                  >
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <h4 className="font-medium text-gray-800">Dr. {doc.username}</h4>
+                        <p className="text-sm text-gray-500">{doc.specialty}</p>
+                        <div className="flex items-center mt-1">
+                          <span className="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded">Available Today</span>
+                        </div>
+                      </div>
+                      <FaChevronRight className="text-gray-400" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <button type="button" onClick={handleBack} className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800">
+                Back
+              </button>
+            </motion.div>
+          )}
+
+          {currentStep === 4 && (
+            <motion.div key="step4" initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -50 }} transition={{ duration: 0.3 }} className="space-y-6">
+              <h3 className="text-lg font-semibold text-gray-800 flex items-center">
+                <FaCalendarAlt className="text-blue-500 mr-2" />
+                Select Date & Time
+              </h3>
+
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Appointment Date</label>
+                <input type="date" value={formData.date} onChange={(e) => setFormData({ ...formData, date: e.target.value, slot: null })} className="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" min={new Date().toISOString().split("T")[0]} required />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Available Time Slots</label>
+                {formData.date && slots.length > 0 ? (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {slots.map((slot, index) => (
+                      <button key={index} type="button" onClick={() => setFormData({ ...formData, slot })} className={`p-3 rounded-lg border flex flex-col items-center ${formData.slot && formData.slot.start_time === slot.start_time ? "bg-blue-500 text-white border-blue-500" : "bg-white border-gray-200 hover:border-blue-300"}`}>
+                        <FaClock className="mb-1" />
+                        <span className="text-sm font-medium">
+                          {slot.start_time} - {slot.end_time}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                ) : formData.date ? (
+                  <div className="p-4 bg-gray-50 rounded-lg text-center text-gray-500">No available slots for this date. Please select another date.</div>
+                ) : (
+                  <div className="p-4 bg-gray-50 rounded-lg text-center text-gray-500">Please select a date to view available time slots.</div>
+                )}
+              </div>
+
+              <div className="flex justify-between pt-4">
+                <button type="button" onClick={handleBack} className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800">
+                  Back
+                </button>
+                <button type="button" onClick={handleNext} disabled={!formData.slot} className={`px-6 py-2 rounded-lg ${formData.slot ? "bg-blue-500 text-white hover:bg-blue-600" : "bg-gray-200 text-gray-500 cursor-not-allowed"}`}>
+                  Next
+                </button>
+              </div>
+            </motion.div>
+          )}
+
+          {currentStep === 5 && (
+            <motion.div key="step5" initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -50 }} transition={{ duration: 0.3 }} className="space-y-6">
+              <h3 className="text-lg font-semibold text-gray-800">Confirm Appointment</h3>
+
+              <div className="bg-blue-50 rounded-lg p-4 mb-6">
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Hospital:</span>
+                    <span className="font-medium">{hospitals.find((h) => h.id === formData.hospital_id)?.name || "Not selected"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Department:</span>
+                    <span className="font-medium">{departments.find((d) => d.id === formData.department_id)?.name || "Not selected"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Doctor:</span>
+                    <span className="font-medium">{doctors.find((d) => d.user_id === formData.doctor_id)?.username || "Not selected"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Date:</span>
+                    <span className="font-medium">{formData.date || "Not selected"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Time:</span>
+                    <span className="font-medium">{formData.slot ? `${formData.slot.start_time} - ${formData.slot.end_time}` : "Not selected"}</span>
+                  </div>
+                </div>
+              </div>
+
+              {message && <div className="p-3 bg-green-100 text-green-700 rounded-lg text-sm">{message}</div>}
+              {error && <div className="p-3 bg-red-100 text-red-700 rounded-lg text-sm">{error}</div>}
+
+              <div className="flex justify-between pt-4">
+                <button type="button" onClick={handleBack} className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800">
+                  Back
+                </button>
+                <button type="submit" disabled={isSubmitting} className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-blue-300 flex items-center">
+                  {isSubmitting ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Processing...
+                    </>
+                  ) : (
+                    "Confirm Appointment"
+                  )}
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </form>
+    </div>
+  );
 };
 
 // Main Page Component
 const BookAppointmentPage = () => {
   const { user, token } = useAuth();
-  const [activeSection, setActiveSection] = useState("welcome");
   const [hospitals, setHospitals] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [doctors, setDoctors] = useState([]);
   const [slots, setSlots] = useState([]);
+  const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     hospital_id: "",
     department_id: "",
@@ -150,7 +311,7 @@ const BookAppointmentPage = () => {
   useEffect(() => {
     const fetchHospitals = async () => {
       try {
-        const response = await fetch("http://localhost:8000/api/hospitals", {
+        const response = await fetch(`${API_URL}/api/hospitals`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await response.json();
@@ -174,7 +335,7 @@ const BookAppointmentPage = () => {
         return;
       }
       try {
-        const response = await fetch(`http://localhost:8000/api/departments?hospital_id=${formData.hospital_id}`, {
+        const response = await fetch(`${API_URL}/api/departments?hospital_id=${formData.hospital_id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await response.json();
@@ -198,7 +359,7 @@ const BookAppointmentPage = () => {
         return;
       }
       try {
-        const response = await fetch(`http://localhost:8000/api/doctors?department_id=${formData.department_id}`, {
+        const response = await fetch(`${API_URL}/api/doctors?department_id=${formData.department_id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await response.json();
@@ -222,7 +383,7 @@ const BookAppointmentPage = () => {
         return;
       }
       try {
-        const response = await fetch(`http://localhost:8000/api/doctor/${formData.doctor_id}/slots?date=${formData.date}`, {
+        const response = await fetch(`${API_URL}/api/doctor/${formData.doctor_id}/slots?date=${formData.date}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await response.json();
@@ -248,7 +409,7 @@ const BookAppointmentPage = () => {
       return;
     }
     try {
-      const response = await fetch("http://localhost:8000/api/appointments", {
+      const response = await fetch(`${API_URL}/api/appointments`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -269,6 +430,7 @@ const BookAppointmentPage = () => {
         setMessage("Appointment booked successfully!");
         setFormData({ hospital_id: "", department_id: "", doctor_id: "", date: "", slot: null });
         setSlots([]);
+        setCurrentStep(1);
       } else {
         setError(data.detail || "Failed to book appointment");
       }
@@ -277,24 +439,9 @@ const BookAppointmentPage = () => {
     }
   };
 
-  const dashboardCards = [
-    {
-      name: "Book Appointment",
-      icon: <FaCalendarCheck className="text-3xl" />,
-      section: "book-appointment",
-      description: "Schedule an appointment with a doctor",
-    },
-  ];
-
-  const cardVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-    hover: { scale: 1.05, transition: { duration: 0.3 } },
-  };
-
   if (!user || !token) {
     return (
-      <div className="flex flex-col min-h-screen bg-gray-100">
+      <div className="flex flex-col min-h-screen bg-gray-50">
         <NavBar />
         <main className="flex-1 py-12 px-4">
           <div className="max-w-7xl mx-auto">
@@ -307,27 +454,16 @@ const BookAppointmentPage = () => {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100">
+    <div className="flex flex-col min-h-screen bg-gray-50">
       <NavBar />
-      <main className="flex-1 py-12 px-4">
-        <div className="max-w-7xl mx-auto">
-          <motion.div className="flex justify-between items-center mb-8" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-            <h1 className="text-3xl font-bold text-gray-800">
-              Book an Appointment, <span className="text-teal-500">{user?.username || "User"}</span>!
-            </h1>
+      <main className="flex-1 py-8 px-4">
+        <div className="max-w-4xl mx-auto">
+          <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="mb-8">
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">Book a New Appointment</h1>
+            <p className="text-gray-600">Follow the steps to schedule your appointment with our specialists</p>
           </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-            {dashboardCards.map((card, index) => (
-              <motion.div key={card.section} className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center text-center cursor-pointer border border-gray-200 hover:border-teal-500" variants={cardVariants} initial="hidden" animate="visible" whileHover="hover" transition={{ delay: index * 0.1 }} onClick={() => setActiveSection(card.section)}>
-                <div className="text-teal-500 mb-4">{card.icon}</div>
-                <h2 className="text-xl font-semibold text-gray-800 mb-2">{card.name}</h2>
-                <p className="text-gray-600">{card.description}</p>
-              </motion.div>
-            ))}
-          </div>
-
-          <BookAppointmentContent activeSection={activeSection} hospitals={hospitals} departments={departments} doctors={doctors} slots={slots} formData={formData} setFormData={setFormData} message={message} error={error} handleSubmit={handleSubmit} />
+          <AppointmentForm hospitals={hospitals} departments={departments} doctors={doctors} slots={slots} formData={formData} setFormData={setFormData} currentStep={currentStep} setCurrentStep={setCurrentStep} message={message} error={error} handleSubmit={handleSubmit} />
         </div>
       </main>
       <Footer />
