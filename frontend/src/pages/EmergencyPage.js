@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import NavBar from "../components/layout/NavBar";
 import Footer from "../components/layout/Footer";
-import { FaAmbulance, FaHospital, FaPhone, FaMapMarkerAlt, FaUserMd, FaClock, FaDirections, FaHeartbeat } from "react-icons/fa";
+import { FaHospital, FaPhone, FaMapMarkerAlt, FaUserMd, FaClock, FaDirections, FaHeartbeat } from "react-icons/fa";
 import { FiAlertTriangle, FiRefreshCw } from "react-icons/fi";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";

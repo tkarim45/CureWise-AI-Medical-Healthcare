@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import { PaperAirplaneIcon, PaperClipIcon } from "@heroicons/react/24/solid";
+import { FiSend, FiX, FiMenu, FiTrash2, FiUser } from "react-icons/fi";
+import { PaperClipIcon } from "@heroicons/react/24/solid";
 import { motion, AnimatePresence } from "framer-motion";
-import NavBar from "../components/layout/NavBar"; // Adjust path if needed
+import NavBar from "../components/layout/NavBar";
 
 const MedicalQueryPage = () => {
   const [query, setQuery] = useState("");
@@ -11,15 +11,10 @@ const MedicalQueryPage = () => {
   const [chatHistory, setChatHistory] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [hasReport, setHasReport] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
-  const navigate = useNavigate();
   const chatEndRef = useRef(null);
   const fileInputRef = useRef(null);
-  const formRef = useRef(null);
 
-  // Scroll to bottom of chat
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatHistory]);
@@ -27,219 +22,172 @@ const MedicalQueryPage = () => {
   const handleFileChange = (e) => {
     if (e.target.files[0]) {
       setFile(e.target.files[0]);
-      setIsUploading(true);
-      setTimeout(() => {
-        setChatHistory([
-          ...chatHistory,
-          {
-            role: "system",
-            content: "File uploaded, processing...",
-            timestamp: new Date().toLocaleTimeString(),
-          },
-        ]);
-        setIsUploading(false);
-      }, 1000);
+      setChatHistory((prev) => [
+        ...prev,
+        {
+          role: "system",
+          content: `CTC report "${e.target.files[0].name}" uploaded. You can now ask follow-up questions!`,
+          timestamp: new Date().toLocaleTimeString(),
+        },
+      ]);
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Get query directly from form input
-    const formData = new FormData(formRef.current);
-    const currentQuery = formData.get("query")?.toString().trim() || "";
-    console.log(`Form query: ${currentQuery}`);
-
-    // Validation
-    if (!hasReport && !file && !currentQuery) {
-      setError("Please upload a report or enter a query.");
+    if (!file && !query.trim()) {
+      setError("Please upload a CTC report or enter a question.");
       return;
     }
-    if (hasReport && !file && !currentQuery) {
-      setError("Please enter a question about your report.");
-      return;
-    }
-
     setLoading(true);
     setError(null);
-
-    const effectiveQuery = currentQuery || "Explain my blood test results";
-    console.log(`Raw query state: ${query}`);
-    console.log(`Sending query: ${effectiveQuery}, file: ${file ? file.name : "none"}`);
-
-    const requestData = new FormData();
-    requestData.append("query", effectiveQuery);
-    if (file) requestData.append("file", file);
-
+    const apiUrl = process.env.REACT_APP_API_URL || "";
+    const token = localStorage.getItem("token");
+    const formData = new FormData();
+    if (file) formData.append("file", file);
+    formData.append("query", query.trim() || "Explain my CTC report");
     try {
-      const { data } = await axios.post("http://localhost:8000/api/medical-query", requestData, {
+      // Add user message
+      if (query.trim()) {
+        setChatHistory((prev) => [
+          ...prev,
+          {
+            role: "user",
+            content: query,
+            timestamp: new Date().toLocaleTimeString(),
+          },
+        ]);
+      }
+      setQuery("");
+      const response = await axios.post(`${apiUrl}/api/medical-query`, formData, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
           "Content-Type": "multipart/form-data",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
+        withCredentials: true,
       });
-
-      setChatHistory([
-        ...chatHistory,
-        {
-          role: "user",
-          content: effectiveQuery || "Uploaded a blood report",
-          timestamp: new Date().toLocaleTimeString(),
-        },
+      setChatHistory((prev) => [
+        ...prev,
         {
           role: "assistant",
-          content: data.response,
+          content: response.data.response,
           timestamp: new Date().toLocaleTimeString(),
         },
       ]);
-      setQuery("");
-      if (file) {
-        setHasReport(true);
-        setFile(null);
-        fileInputRef.current.value = null;
-      }
+      setFile(null);
+      if (fileInputRef.current) fileInputRef.current.value = null;
     } catch (err) {
-      setError(err.response?.data?.detail || "Error processing query");
-      if (err.response?.status === 401) {
-        alert("Session expired. Please log in again.");
-        localStorage.removeItem("token");
-        navigate("/login");
-      }
+      setError(err.response?.data?.detail || "Error processing your request.");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault(); // Prevent default Enter behavior
-      formRef.current.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
-    }
+  const handleQuickQuestion = (text) => {
+    setQuery(text);
   };
 
-  const handleNewReport = () => {
-    setHasReport(false);
+  const handleClearHistory = () => {
     setChatHistory([]);
+    setError(null);
     setFile(null);
-    fileInputRef.current.value = null;
-    setQuery("");
-  };
-
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
+    if (fileInputRef.current) fileInputRef.current.value = null;
   };
 
   return (
-    <div className="flex flex-col h-screen bg-secondary font-inter">
+    <div className="flex flex-col h-screen bg-gray-50">
       <NavBar />
-      <div className="flex flex-1">
-        <div className={`fixed inset-y-0 left-0 w-64 bg-primary text-white transform ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0 transition-transform duration-300 ease-in-out z-30 mt-16 md:mt-0`}>
-          <div className="p-6">
-            <h1 className="text-2xl font-bold">HealthSync AI</h1>
-          </div>
-          <div className="p-6">
-            <button onClick={handleNewReport} className="w-full bg-accent text-text p-3 rounded-lg hover:bg-white hover:text-primary transition-colors shadow-soft">
-              New Report
-            </button>
-          </div>
-        </div>
-        <div className="flex-1 flex flex-col md:ml-64">
-          <button className="md:hidden p-4 bg-primary text-white" onClick={toggleSidebar}>
-            {sidebarOpen ? "Close" : "Menu"}
-          </button>
-          <div className="flex-1 overflow-y-auto p-6 bg-bgLight">
-            {chatHistory.length === 0 && !isUploading && !loading && (
-              <div className="text-center text-text/60 mt-20">
-                <p className="text-lg">Upload a blood report to start the conversation!</p>
+      <div className="flex flex-1 overflow-hidden">
+        {/* Sidebar */}
+        <AnimatePresence>
+          {sidebarOpen && (
+            <motion.aside initial={{ x: -300, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -300, opacity: 0 }} transition={{ type: "spring", stiffness: 300, damping: 30 }} className="fixed md:relative z-20 w-64 h-full bg-white border-r border-gray-200 shadow-sm">
+              <div className="p-4 border-b border-gray-200">
+                <h2 className="text-lg font-semibold text-gray-800">CTC Report Chat</h2>
+              </div>
+              <div className="p-4">
+                <button onClick={handleClearHistory} className="w-full flex items-center justify-center space-x-2 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-4 rounded-lg transition-colors">
+                  <FiTrash2 />
+                  <span>Clear Chat</span>
+                </button>
+              </div>
+            </motion.aside>
+          )}
+        </AnimatePresence>
+        {/* Main Content */}
+        <main className="flex-1 flex flex-col overflow-hidden">
+          {/* Chat Area */}
+          <div className="flex-1 overflow-y-auto p-6">
+            {chatHistory.length === 0 && !loading && (
+              <div className="h-full flex flex-col items-center justify-center text-center p-6">
+                <div className="bg-blue-100 p-4 rounded-full mb-4">
+                  <FiUser className="text-blue-600 text-3xl" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-800 mb-2">Upload your CTC Report</h3>
+                <p className="text-gray-600 max-w-md mb-6">Upload a CTC (Complete Blood Count) report and ask follow-up questions. The AI will help you understand your results in simple terms.</p>
+                <button onClick={() => fileInputRef.current.click()} className="bg-blue-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-blue-700 transition-all shadow-md flex items-center space-x-2">
+                  <PaperClipIcon className="h-5 w-5 mr-2" />
+                  <span>Upload CTC Report (PDF)</span>
+                </button>
               </div>
             )}
-            {chatHistory.map((msg, index) => (
-              <div key={index} className={`flex ${msg.role === "user" ? "justify-end" : msg.role === "system" ? "justify-center" : "justify-start"} mb-6`}>
-                <div className={`flex items-start space-x-3 max-w-2xl w-full ${msg.role === "user" ? "flex-row-reverse space-x-reverse" : ""} ${msg.role === "system" ? "max-w-xl mx-auto" : ""}`}>
-                  {msg.role !== "system" && (
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center ${msg.role === "user" ? "bg-accent" : "bg-primary"} shadow-soft flex-shrink-0`}>
-                      <span className={`font-bold text-lg ${msg.role === "user" ? "text-text" : "text-white"}`}>{msg.role === "user" ? "U" : "AI"}</span>
-                    </div>
-                  )}
-                  <motion.div className={`p-4 rounded-xl shadow-soft ${msg.role === "user" ? "bg-accent text-text" : msg.role === "system" ? "bg-primary/10 text-text/80" : "bg-secondary text-text"}`} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
-                    <p>{msg.content}</p>
-                    <p className="text-xs opacity-60 mt-2">{msg.timestamp}</p>
-                  </motion.div>
+            <div className="max-w-3xl mx-auto space-y-6">
+              {chatHistory.map((msg, index) => (
+                <div key={index} className={`flex ${msg.role === "user" ? "justify-end" : msg.role === "system" ? "justify-center" : "justify-start"}`}>
+                  <div className={`max-w-[85%] ${msg.role === "user" ? "ml-auto" : ""}`}>
+                    <motion.div className={`p-4 rounded-2xl ${msg.role === "user" ? "bg-blue-600 text-white rounded-br-none" : msg.role === "system" ? "bg-gray-100 text-gray-700 text-center" : "bg-white text-gray-800 rounded-bl-none shadow-sm border border-gray-200"}`} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
+                      <div className="flex items-center mb-1 justify-between">
+                        {msg.role === "assistant" ? <FiUser className="mr-2 text-blue-500" /> : msg.role === "user" ? <FiUser className="mr-2 text-blue-200" /> : null}
+                        <span className="text-xs opacity-70">{msg.timestamp}</span>
+                      </div>
+                      <p>{msg.content}</p>
+                    </motion.div>
+                  </div>
                 </div>
-              </div>
-            ))}
-            <AnimatePresence>
+              ))}
               {loading && (
-                <motion.div className="flex justify-start mb-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                  <div className="flex items-center space-x-3 max-w-md">
-                    <div className="w-12 h-12 rounded-full flex items-center justify-center bg-primary shadow-soft">
-                      <span className="font-bold text-lg text-white">AI</span>
-                    </div>
-                    <div className="p-4 rounded-xl bg-secondary shadow-soft flex items-center space-x-2">
-                      <motion.div className="w-2 h-2 bg-text rounded-full" animate={{ y: [0, -5, 0] }} transition={{ repeat: Infinity, duration: 0.5, delay: 0 }} />
-                      <motion.div
-                        className="w-2 h-2 bg-text rounded-full"
-                        animate={{ y: [0, -5, 0] }}
-                        transition={{
-                          repeat: Infinity,
-                          duration: 0.5,
-                          delay: 0.2,
-                        }}
-                      />
-                      <motion.div
-                        className="w-2 h-2 bg-text rounded-full"
-                        animate={{ y: [0, -5, 0] }}
-                        transition={{
-                          repeat: Infinity,
-                          duration: 0.5,
-                          delay: 0.4,
-                        }}
-                      />
+                <motion.div className="flex justify-start" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                  <div className="max-w-[85%] bg-white p-4 rounded-2xl rounded-bl-none shadow-sm border border-gray-200">
+                    <div className="flex items-center space-x-2">
+                      <div className="flex space-x-1">
+                        <motion.div className="w-2 h-2 bg-gray-400 rounded-full" animate={{ y: [0, -5, 0] }} transition={{ repeat: Infinity, duration: 0.6 }} />
+                        <motion.div className="w-2 h-2 bg-gray-400 rounded-full" animate={{ y: [0, -5, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0.2 }} />
+                        <motion.div className="w-2 h-2 bg-gray-400 rounded-full" animate={{ y: [0, -5, 0] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0.4 }} />
+                      </div>
+                      <span className="text-sm text-gray-500">AI is analyzing your report...</span>
                     </div>
                   </div>
                 </motion.div>
               )}
-            </AnimatePresence>
-            <div ref={chatEndRef} />
-          </div>
-          <div className="p-6 bg-bgLight">
-            <div className="max-w-3xl mx-auto">
-              <form ref={formRef} onSubmit={handleSubmit} className="flex items-center space-x-3 bg-bgLight p-3 rounded-full shadow-soft border border-primary/10">
-                {!hasReport && (
-                  <button type="button" onClick={() => fileInputRef.current.click()} className="p-2 text-text/60 hover:text-primary transition-colors" disabled={isUploading}>
-                    <motion.div
-                      animate={isUploading ? { rotate: 360 } : { rotate: 0 }}
-                      transition={{
-                        duration: 1,
-                        repeat: isUploading ? Infinity : 0,
-                      }}
-                    >
-                      <PaperClipIcon className="h-6 w-6" />
-                    </motion.div>
-                  </button>
-                )}
-                <input type="file" accept=".pdf" ref={fileInputRef} className="hidden" onChange={handleFileChange} disabled={isUploading} />
-                <input
-                  type="text"
-                  name="query"
-                  value={query}
-                  onChange={(e) => {
-                    console.log(`Input changed: ${e.target.value}`);
-                    setQuery(e.target.value);
-                  }}
-                  onKeyDown={handleKeyDown}
-                  placeholder={hasReport ? "Ask a question about your report..." : "Upload a report to start"}
-                  className="flex-1 p-3 bg-transparent text-text placeholder-text/40 focus:outline-none"
-                  disabled={loading || (!hasReport && !file)}
-                />
-                <button type="submit" disabled={loading || (!hasReport && !file && !query.trim())} className="p-3 bg-primary text-white rounded-full hover:bg-accent hover:text-text disabled:bg-gray-300 disabled:text-gray-500 transition-colors">
-                  <PaperAirplaneIcon className="h-5 w-5" />
-                </button>
-              </form>
-              {error && <p className="text-error text-sm mt-3 text-center">{error}</p>}
+              <div ref={chatEndRef} />
             </div>
           </div>
-        </div>
+          {/* Input Area */}
+          <div className="border-t border-gray-200 bg-white p-4">
+            <div className="max-w-3xl mx-auto">
+              <form onSubmit={handleSubmit} className="relative flex items-center space-x-3">
+                <input type="file" accept=".pdf" ref={fileInputRef} className="hidden" onChange={handleFileChange} />
+                <button type="button" onClick={() => fileInputRef.current.click()} className="p-2 text-gray-500 hover:text-blue-600 transition-colors" title="Upload CTC Report">
+                  <PaperClipIcon className="h-6 w-6" />
+                </button>
+                <input type="text" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Ask a follow-up question about your CTC report..." className="flex-1 p-3 bg-gray-50 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" disabled={loading || (!file && chatHistory.length === 0)} />
+                <button type="submit" disabled={loading || (!file && !query.trim())} className="bg-blue-600 text-white p-3 rounded-full hover:bg-blue-700 disabled:bg-gray-300 transition-colors">
+                  <FiSend />
+                </button>
+              </form>
+              {error && (
+                <motion.p className="text-red-500 text-sm mt-2 text-center" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
+                  {error}
+                </motion.p>
+              )}
+            </div>
+          </div>
+        </main>
       </div>
+      {/* Mobile sidebar toggle */}
+      <button onClick={() => setSidebarOpen(!sidebarOpen)} className="md:hidden fixed bottom-6 left-6 z-10 bg-white p-3 rounded-full shadow-lg border border-gray-200">
+        {sidebarOpen ? <FiX /> : <FiMenu />}
+      </button>
     </div>
   );
 };

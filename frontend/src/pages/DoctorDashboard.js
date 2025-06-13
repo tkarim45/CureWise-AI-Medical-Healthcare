@@ -2,30 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import NavBar from "../components/layout/NavBar";
 import { useAuth } from "../context/AuthContext";
-import { FaBuilding, FaCalendar, FaHeart, FaUserMd, FaClock, FaChevronRight } from "react-icons/fa";
-
-// Footer Component (unchanged)
-const Footer = () => {
-  const footerVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
-  };
-
-  return (
-    <motion.footer className="bg-gray-50 py-6 border-t border-gray-200" initial="hidden" animate="visible" variants={footerVariants}>
-      <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-gray-600">
-        <p className="text-sm">© {new Date().getFullYear()} HealthSync AI. All rights reserved.</p>
-        <div className="flex items-center space-x-2 mt-2 md:mt-0">
-          <span className="text-sm">Made with</span>
-          <motion.span className="text-teal-500" animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}>
-            <FaHeart />
-          </motion.span>
-          <span className="text-sm">by the HealthSync Team</span>
-        </div>
-      </div>
-    </motion.footer>
-  );
-};
+import { FaBuilding, FaCalendar, FaUserMd, FaClock, FaChevronRight } from "react-icons/fa";
 
 // Main Dashboard Component
 const DoctorDashboard = () => {
