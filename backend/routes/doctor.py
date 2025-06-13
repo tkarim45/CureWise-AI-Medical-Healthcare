@@ -266,11 +266,11 @@ async def assign_doctor(
             raise HTTPException(status_code=404, detail="No hospital assigned")
         hospital_id = hospital_id[0]
         logger.info(f"Admin hospital_id: {hospital_id}")
-    elif current_user["role"] == "superadmin":
+    elif current_user["role"] == "super_admin":
         if not doctor.hospital_id:
             raise HTTPException(
                 status_code=400,
-                detail="hospital_id is required for superadmin doctor creation",
+                detail="hospital_id is required for super_admin doctor creation",
             )
         hospital_id = doctor.hospital_id
         conn = psycopg2.connect(

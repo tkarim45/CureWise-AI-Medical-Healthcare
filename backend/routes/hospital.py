@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Body, Path
 from typing import List
 from models.schemas import (
     HospitalResponse,
@@ -618,6 +618,152 @@ async def update_admin(
     except psycopg2.Error as e:
         conn.rollback()
         logger.error(f"Database error during admin update: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+    finally:
+        conn.close()
+
+
+@router.get("/api/hospitals/{hospital_id}/departments")
+async def get_departments_by_hospital(
+    hospital_id: str, current_user: dict = Depends(get_current_user)
+):
+    """
+    Returns all departments for a given hospital.
+    """
+    conn = psycopg2.connect(
+        dbname=settings.DB_NAME,
+        user=settings.DB_USER,
+        password=settings.DB_PASSWORD,
+        host=settings.DB_HOST,
+        port=settings.DB_PORT,
+    )
+    c = conn.cursor()
+    c.execute(
+        "SELECT id, name FROM departments WHERE hospital_id = %s",
+        (hospital_id,),
+    )
+    departments = [{"id": row[0], "name": row[1]} for row in c.fetchall()]
+    conn.close()
+    # Return empty list if no departments, do not raise 404
+    return departments
+
+
+@router.post("/api/hospitals/{hospital_id}/departments")
+async def create_department_for_hospital(
+    hospital_id: str,
+    department: dict = Body(...),
+    current_user: dict = Depends(get_current_user),
+):
+    """
+    Create a new department for a given hospital.
+    """
+    if current_user["role"] != "super_admin":
+        raise HTTPException(status_code=403, detail="Not authorized")
+    if not department.get("name"):
+        raise HTTPException(status_code=400, detail="Department name is required")
+    conn = psycopg2.connect(
+        dbname=settings.DB_NAME,
+        user=settings.DB_USER,
+        password=settings.DB_PASSWORD,
+        host=settings.DB_HOST,
+        port=settings.DB_PORT,
+    )
+    c = conn.cursor()
+    # Check hospital exists
+    c.execute("SELECT id FROM hospitals WHERE id = %s", (hospital_id,))
+    if not c.fetchone():
+        conn.close()
+        raise HTTPException(status_code=404, detail="Hospital not found")
+    department_id = str(uuid.uuid4())
+    c.execute(
+        "INSERT INTO departments (id, name, hospital_id) VALUES (%s, %s, %s)",
+        (department_id, department["name"], hospital_id),
+    )
+    conn.commit()
+    conn.close()
+    return {"id": department_id, "name": department["name"], "hospital_id": hospital_id}
+
+
+@router.put("/api/departments/{department_id}")
+async def update_department(
+    department_id: str = Path(...),
+    department: dict = Body(...),
+    current_user: dict = Depends(require_role("super_admin")),
+):
+    """
+    Update a department's name (and description if present).
+    """
+    if not department.get("name"):
+        raise HTTPException(status_code=400, detail="Department name is required")
+    conn = psycopg2.connect(
+        dbname=settings.DB_NAME,
+        user=settings.DB_USER,
+        password=settings.DB_PASSWORD,
+        host=settings.DB_HOST,
+        port=settings.DB_PORT,
+    )
+    c = conn.cursor()
+    c.execute("SELECT id FROM departments WHERE id = %s", (department_id,))
+    if not c.fetchone():
+        conn.close()
+        raise HTTPException(status_code=404, detail="Department not found")
+    try:
+        # Optionally update description if present
+        if "description" in department:
+            c.execute(
+                "UPDATE departments SET name = %s, description = %s WHERE id = %s",
+                (department["name"], department["description"], department_id),
+            )
+        else:
+            c.execute(
+                "UPDATE departments SET name = %s WHERE id = %s",
+                (department["name"], department_id),
+            )
+        conn.commit()
+        logger.info(
+            f"Department updated: {department_id} by super_admin: {current_user['user_id']}"
+        )
+        return {
+            "id": department_id,
+            "name": department["name"],
+            "description": department.get("description"),
+        }
+    except psycopg2.Error as e:
+        conn.rollback()
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+    finally:
+        conn.close()
+
+
+@router.delete("/api/departments/{department_id}")
+async def delete_department(
+    department_id: str = Path(...),
+    current_user: dict = Depends(require_role("super_admin")),
+):
+    """
+    Delete a department by ID.
+    """
+    conn = psycopg2.connect(
+        dbname=settings.DB_NAME,
+        user=settings.DB_USER,
+        password=settings.DB_PASSWORD,
+        host=settings.DB_HOST,
+        port=settings.DB_PORT,
+    )
+    c = conn.cursor()
+    c.execute("SELECT id FROM departments WHERE id = %s", (department_id,))
+    if not c.fetchone():
+        conn.close()
+        raise HTTPException(status_code=404, detail="Department not found")
+    try:
+        c.execute("DELETE FROM departments WHERE id = %s", (department_id,))
+        conn.commit()
+        logger.info(
+            f"Department deleted: {department_id} by super_admin: {current_user['user_id']}"
+        )
+        return {"detail": "Department deleted"}
+    except psycopg2.Error as e:
+        conn.rollback()
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
     finally:
         conn.close()
