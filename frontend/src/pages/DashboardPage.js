@@ -1,48 +1,103 @@
 import React, { useState } from "react";
-import { useAuth } from "../context/AuthContext"; // Adjust path if needed
+import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import NavBar from "../components/layout/NavBar"; // Adjust path if needed
-import DashboardContent from "../components/layout/DashboardContent";
-import { FaHistory, FaCalendar, FaCamera, FaQuestionCircle, FaAmbulance, FaComments, FaUser } from "react-icons/fa";
-import { FaHeart } from "react-icons/fa";
-
-// Footer Component
-const Footer = () => {
-  const footerVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
-  };
-
-  return (
-    <motion.footer className="bg-gray-50 py-6 border-t border-gray-200" initial="hidden" animate="visible" variants={footerVariants}>
-      <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-gray-600">
-        <p className="text-sm">© {new Date().getFullYear()} HealthSync AI. All rights reserved.</p>
-        <div className="flex items-center space-x-2 mt-2 md:mt-0">
-          <span className="text-sm">Made with</span>
-          <motion.span className="text-teal-500" animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}>
-            <FaHeart />
-          </motion.span>
-          <span className="text-sm">by the HealthSync Team</span>
-        </div>
-      </div>
-    </motion.footer>
-  );
-};
+import { motion, AnimatePresence } from "framer-motion";
+import NavBar from "../components/layout/NavBar";
+import { FaHistory, FaCalendarAlt, FaFileMedical, FaAmbulance, FaCommentMedical, FaUserCog, FaEye, FaLungs, FaBrain, FaHeartbeat } from "react-icons/fa";
+import { RiDashboardLine, RiMentalHealthLine } from "react-icons/ri";
+import { IoMdAnalytics } from "react-icons/io";
 
 const DashboardPage = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [activeSection, setActiveSection] = useState("welcome");
+  const [activeSection, setActiveSection] = useState("dashboard");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
-  const dashboardCards = [
-    { name: "Medical History", icon: <FaHistory className="text-3xl" />, path: "/medical-history", description: "View your health records" },
-    { name: "Book Appointment", icon: <FaCalendar className="text-3xl" />, path: "/book-appointment", description: "Schedule with AI" },
-    { name: "Disease Detection", icon: <FaCamera className="text-3xl" />, path: "/disease-detection", description: "Analyze images" },
-    { name: "Analyze Blood Reports", icon: <FaQuestionCircle className="text-3xl" />, path: "/medical-query", description: "Ask health questions" },
-    { name: "Emergency Navigation", icon: <FaAmbulance className="text-3xl" />, path: "/emergency", description: "Find help fast" },
-    { name: "General Query", icon: <FaComments className="text-3xl" />, path: "/general-query", description: "Ask anything" },
-    { name: "Profile", icon: <FaUser className="text-3xl" />, path: "/profile", description: "Manage your account" }, // Changed to path
+  // Dashboard features organized by category
+  const healthFeatures = [
+    {
+      title: "Medical History",
+      icon: <FaHistory className="text-2xl" />,
+      path: "/medical-history",
+      color: "bg-blue-50 text-blue-700",
+      description: "Access your complete health records",
+    },
+    {
+      title: "Appointments",
+      icon: <FaCalendarAlt className="text-2xl" />,
+      path: "/appointments",
+      color: "bg-purple-50 text-purple-700",
+      description: "Schedule and manage doctor visits",
+    },
+    {
+      title: "Health Analytics",
+      icon: <IoMdAnalytics className="text-2xl" />,
+      path: "/analytics",
+      color: "bg-teal-50 text-teal-700",
+      description: "Track your health metrics over time",
+    },
+  ];
+
+  const aiDetectionFeatures = [
+    {
+      title: "Eye Disease Detection",
+      icon: <FaEye className="text-2xl" />,
+      path: "/eye-detection",
+      color: "bg-indigo-50 text-indigo-700",
+      description: "Analyze eye images for diseases",
+    },
+    {
+      title: "Lung Cancer Detection",
+      icon: <FaLungs className="text-2xl" />,
+      path: "/lung-detection",
+      color: "bg-red-50 text-red-700",
+      description: "Screen lung CT scans for abnormalities",
+    },
+    {
+      title: "Brain Tumor Analysis",
+      icon: <FaBrain className="text-2xl" />,
+      path: "/brain-analysis",
+      color: "bg-amber-50 text-amber-700",
+      description: "Detect tumors in brain MRI scans",
+    },
+    {
+      title: "Heart Health Scan",
+      icon: <FaHeartbeat className="text-2xl" />,
+      path: "/heart-scan",
+      color: "bg-pink-50 text-pink-700",
+      description: "Analyze ECG and heart-related data",
+    },
+  ];
+
+  const supportFeatures = [
+    {
+      title: "Medical Reports",
+      icon: <FaFileMedical className="text-2xl" />,
+      path: "/reports",
+      color: "bg-green-50 text-green-700",
+      description: "Upload and analyze medical reports",
+    },
+    {
+      title: "Emergency Services",
+      icon: <FaAmbulance className="text-2xl" />,
+      path: "/emergency",
+      color: "bg-red-50 text-red-700",
+      description: "Immediate medical assistance",
+    },
+    {
+      title: "Health Assistant",
+      icon: <FaCommentMedical className="text-2xl" />,
+      path: "/assistant",
+      color: "bg-cyan-50 text-cyan-700",
+      description: "AI-powered health consultation",
+    },
+    {
+      title: "Account Settings",
+      icon: <FaUserCog className="text-2xl" />,
+      path: "/profile",
+      color: "bg-gray-50 text-gray-700",
+      description: "Manage your account details",
+    },
   ];
 
   const handleLogout = () => {
@@ -50,47 +105,170 @@ const DashboardPage = () => {
     navigate("/login");
   };
 
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
   const cardVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-    hover: { scale: 1.05, transition: { duration: 0.3 } },
+    hidden: { opacity: 0, y: 30 },
+    visible: (i) => ({
+      opacity: 1,
+      y: 0,
+      transition: { delay: i * 0.15, duration: 0.6, ease: "easeOut" },
+    }),
+    hover: {
+      y: -8,
+      scale: 1.03,
+      boxShadow: "0 15px 30px rgba(0, 0, 0, 0.1)",
+      transition: { duration: 0.3 },
+    },
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100">
-      {/* Navbar */}
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 font-sans">
       <NavBar />
 
-      {/* Main Content */}
-      <main className="flex-1 py-12 px-4">
-        <div className="max-w-7xl mx-auto">
-          <motion.div className="flex justify-between items-center mb-8" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-            <h1 className="text-3xl font-bold text-gray-800">
-              Welcome, <span className="text-teal-500">{user?.username || "User"}</span>!
-            </h1>
-            <motion.button className="p-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600" onClick={handleLogout} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              Logout
-            </motion.button>
-          </motion.div>
+      <div className="flex">
+        {/* Sidebar */}
+        <AnimatePresence>
+          {isSidebarOpen && (
+            <motion.aside initial={{ x: -300, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -300, opacity: 0 }} transition={{ type: "spring", stiffness: 300, damping: 30 }} className="hidden md:block w-72 bg-white shadow-lg p-6 fixed h-[calc(100vh-80px)] overflow-y-auto">
+              <div className="mb-10">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">HealthSync AI</h2>
+                <div className="space-y-4">
+                  <button onClick={() => setActiveSection("dashboard")} className={`w-full flex items-center p-4 rounded-xl text-lg font-medium transition-all ${activeSection === "dashboard" ? "bg-blue-100 text-blue-700 shadow-sm" : "text-gray-700 hover:bg-gray-50"}`}>
+                    <RiDashboardLine className="mr-4 text-xl" />
+                    Dashboard
+                  </button>
 
-          {/* Card Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-            {dashboardCards.map((card, index) => (
-              <motion.div key={card.section || card.path} className="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center text-center cursor-pointer border border-gray-200 hover:border-teal-500" variants={cardVariants} initial="hidden" animate="visible" whileHover="hover" transition={{ delay: index * 0.1 }} onClick={() => (card.path ? navigate(card.path) : setActiveSection(card.section))}>
-                <div className="text-teal-500 mb-4">{card.icon}</div>
-                <h2 className="text-xl font-semibold text-gray-800 mb-2">{card.name}</h2>
-                <p className="text-gray-600">{card.description}</p>
-              </motion.div>
-            ))}
+                  <div className="pt-6">
+                    <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Health Tools</h3>
+                    {healthFeatures.map((feature) => (
+                      <button key={feature.path} onClick={() => navigate(feature.path)} className="w-full flex items-center p-3 rounded-lg text-gray-700 hover:bg-gray-50 transition-all mb-2">
+                        <span className={`p-3 rounded-full mr-4 ${feature.color}`}>{feature.icon}</span>
+                        <span className="text-base font-medium">{feature.title}</span>
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="pt-6">
+                    <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">AI Detection</h3>
+                    {aiDetectionFeatures.map((feature) => (
+                      <button key={feature.path} onClick={() => navigate(feature.path)} className="w-full flex items-center p-3 rounded-lg text-gray-700 hover:bg-gray-50 transition-all mb-2">
+                        <span className={`p-3 rounded-full mr-4 ${feature.color}`}>{feature.icon}</span>
+                        <span className="text-base font-medium">{feature.title}</span>
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="pt-6">
+                    <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Support</h3>
+                    {supportFeatures.map((feature) => (
+                      <button key={feature.path} onClick={() => navigate(feature.path)} className="w-full flex items-center p-3 rounded-lg text-gray-700 hover:bg-gray-50 transition-all mb-2">
+                        <span className={`p-3 rounded-full mr-4 ${feature.color}`}>{feature.icon}</span>
+                        <span className="text-base font-medium">{feature.title}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </motion.aside>
+          )}
+        </AnimatePresence>
+
+        {/* Main Content */}
+        <main className={`flex-1 p-8 lg:p-12 transition-all duration-300 ${isSidebarOpen ? "md:ml-72" : "md:ml-0"}`}>
+          {/* Header */}
+          <div className="flex justify-between items-center mb-12">
+            <motion.div initial={{ opacity: 0, y: -30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+              <h1 className="text-3xl lg:text-4xl font-extrabold text-gray-900">{activeSection === "dashboard" ? "Health Dashboard" : activeSection.charAt(0).toUpperCase() + activeSection.slice(1)}</h1>
+              <p className="text-lg text-gray-600 mt-2">{activeSection === "dashboard" ? `Welcome back, ${user?.username || "User"}! Manage your health seamlessly.` : "Leverage AI-powered tools for your wellness"}</p>
+            </motion.div>
+
+            <div className="flex items-center space-x-4">
+              <button onClick={toggleSidebar} className="hidden md:flex items-center justify-center p-3 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition-all">
+                {isSidebarOpen ? (
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                )}
+              </button>
+
+              <motion.button onClick={handleLogout} className="px-6 py-3 bg-gradient-to-r from-blue-600 to-teal-500 text-white rounded-full font-semibold hover:opacity-90 shadow-md" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                Logout
+              </motion.button>
+            </div>
           </div>
 
-          {/* Dynamic Content */}
-          <DashboardContent activeSection={activeSection} />
-        </div>
-      </main>
+          {/* Dashboard Content */}
+          {activeSection === "dashboard" && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6 }} className="space-y-12">
+              {/* Health Summary Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                {healthFeatures.map((feature, index) => (
+                  <motion.div key={feature.path} custom={index} variants={cardVariants} initial="hidden" animate="visible" whileHover="hover" onClick={() => navigate(feature.path)} className="bg-white p-8 rounded-2xl shadow-md border border-gray-100 cursor-pointer hover:shadow-lg transition-all">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <div className={`p-4 rounded-full ${feature.color} mb-4`}>{feature.icon}</div>
+                        <h3 className="text-xl font-bold text-gray-900">{feature.title}</h3>
+                        <p className="text-sm text-gray-500 mt-2">{feature.description}</p>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
 
-      {/* Footer */}
-      <Footer />
+              {/* AI Detection Section */}
+              <div>
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-bold text-gray-900">AI Health Detection</h2>
+                  <button className="text-sm font-semibold text-blue-600 hover:text-blue-800">Explore All AI Tools</button>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                  {aiDetectionFeatures.map((feature, index) => (
+                    <motion.div key={feature.path} custom={index + healthFeatures.length} variants={cardVariants} initial="hidden" animate="visible" whileHover="hover" onClick={() => navigate(feature.path)} className="bg-white p-8 rounded-2xl shadow-md border border-gray-100 cursor-pointer hover:shadow-lg transition-all">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <div className={`p-4 rounded-full ${feature.color} mb-4`}>{feature.icon}</div>
+                          <h3 className="text-xl font-bold text-gray-900">{feature.title}</h3>
+                          <p className="text-sm text-gray-500 mt-2">{feature.description}</p>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Recent Activity */}
+              <div className="bg-white p-8 rounded-2xl shadow-md border border-gray-100">
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-xl font-bold text-gray-900">Recent Health Activity</h3>
+                  <button className="text-sm font-semibold text-blue-600 hover:text-blue-800">View All</button>
+                </div>
+                <div className="space-y-6">
+                  {[...Array(3)].map((_, i) => (
+                    <motion.div key={i} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.2, duration: 0.5 }} className="flex items-start pb-6 border-b border-gray-100 last:border-0 last:pb-0">
+                      <div className="flex-shrink-0 mt-1">
+                        <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                          <RiMentalHealthLine className="h-5 w-5" />
+                        </div>
+                      </div>
+                      <div className="ml-4">
+                        <p className="text-base font-medium text-gray-900">Completed eye disease screening</p>
+                        <p className="text-sm text-gray-500">2 hours ago - 98% accuracy</p>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </main>
+      </div>
     </div>
   );
 };
