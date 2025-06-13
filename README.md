@@ -1,4 +1,4 @@
-# CureWise-AI: LLM & AI-Powered Healthcare Data Platform
+# CureWise-AI: AI-Powered Healthcare Platform
 
 **CureWise-AI** is a modern, production-grade healthcare data platform that leverages Large Language Models (LLMs), Retrieval-Augmented Generation (RAG), and advanced AI/ML techniques to deliver intelligent analytics, medical report parsing, and conversational AI for hospitals, doctors, and patients.
 
