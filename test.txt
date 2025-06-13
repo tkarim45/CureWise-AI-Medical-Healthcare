@@ -1,6 +1,0 @@
-
-brew install postgresql
-brew services start postgresql
-psql -l
-createdb curewise
-psql -U tkarim45 -d curewise -h localhost

@@ -154,6 +154,20 @@ npm start
 
 ---
 
+## PostgreSQL Setup (macOS)
+
+To set up PostgreSQL for local development, run the following commands:
+
+```sh
+brew install postgresql
+brew services start postgresql
+psql -l
+createdb curewise
+psql -U tkarim45 -d curewise -h localhost
+```
+
+---
+
 ## Development & Contribution
 
 - Fork and clone the repo.
