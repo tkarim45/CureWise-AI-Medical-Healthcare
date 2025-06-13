@@ -3,8 +3,10 @@ import logging
 from config.settings import settings
 import uuid
 from datetime import datetime
+from passlib.context import CryptContext
 
 logger = logging.getLogger(__name__)
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def init_db():
@@ -235,3 +237,93 @@ async def get_user(username: str):
             created_at=user[5],  # Already a timestamp
         )
     return None
+
+
+async def initialize_users():
+    logger.info("Checking for default Super Admin and Admin users...")
+    conn = psycopg2.connect(
+        dbname=settings.DB_NAME,
+        user=settings.DB_USER,
+        password=settings.DB_PASSWORD,
+        host=settings.DB_HOST,
+        port=settings.DB_PORT,
+    )
+    c = conn.cursor()
+
+    # Super Admin
+    super_admin_data = {
+        "username": "superadmin",
+        "email": "superadmin@gmail.com",
+        "password": "superadmin",
+        "role": "super_admin",
+    }
+
+    # Check if Super Admin exists
+    c.execute(
+        "SELECT id FROM users WHERE username = %s", (super_admin_data["username"],)
+    )
+    if not c.fetchone():
+        user_id = str(uuid.uuid4())
+        hashed_password = pwd_context.hash(super_admin_data["password"])
+        created_at = datetime.utcnow()
+        try:
+            c.execute(
+                """
+                INSERT INTO users (id, username, email, password, role, created_at)
+                VALUES (%s, %s, %s, %s, %s, %s)
+                """,
+                (
+                    user_id,
+                    super_admin_data["username"],
+                    super_admin_data["email"],
+                    hashed_password,
+                    super_admin_data["role"],
+                    created_at,
+                ),
+            )
+            conn.commit()
+            logger.info(f"Created Super Admin user: {super_admin_data['username']}")
+        except psycopg2.IntegrityError as e:
+            conn.rollback()
+            logger.error(f"Failed to create Super Admin: {str(e)}")
+    else:
+        logger.info(f"Super Admin user {super_admin_data['username']} already exists")
+
+    # Admin
+    admin_data = {
+        "username": "admin",
+        "email": "admin@gmail.com",
+        "password": "admin",
+        "role": "admin",
+    }
+
+    # Check if Admin exists
+    c.execute("SELECT id FROM users WHERE username = %s", (admin_data["username"],))
+    if not c.fetchone():
+        user_id = str(uuid.uuid4())
+        hashed_password = pwd_context.hash(admin_data["password"])
+        created_at = datetime.utcnow()
+        try:
+            c.execute(
+                """
+                INSERT INTO users (id, username, email, password, role, created_at)
+                VALUES (%s, %s, %s, %s, %s, %s)
+                """,
+                (
+                    user_id,
+                    admin_data["username"],
+                    admin_data["email"],
+                    hashed_password,
+                    admin_data["role"],
+                    created_at,
+                ),
+            )
+            conn.commit()
+            logger.info(f"Created Admin user: {admin_data['username']}")
+        except psycopg2.IntegrityError as e:
+            conn.rollback()
+            logger.error(f"Failed to create Admin: {str(e)}")
+    else:
+        logger.info(f"Admin user {admin_data['username']} already exists")
+
+    conn.close()
