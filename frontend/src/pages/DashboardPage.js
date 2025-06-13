@@ -92,6 +92,13 @@ const DashboardPage = () => {
       description: "AI-powered health consultation",
     },
     {
+      title: "Picture Diagnosis",
+      icon: <FaFileMedical className="text-2xl" />,
+      path: "/disease-detection",
+      color: "bg-purple-300 bg-opacity-50 text-purple-900",
+      description: "Upload images for AI analysis",
+    },
+    {
       title: "Account Settings",
       icon: <FaUserCog className="text-2xl" />,
       path: "/profile",
