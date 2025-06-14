@@ -33,13 +33,10 @@ class Settings:
     DB_PORT = os.getenv("DB_PORT")
 
     KIDNEY_MODEL_PATH = os.getenv("KIDNEY_MODEL_PATH")
-    BREAST_CANCER_MODEL_PATH = os.getenv(
-        "BREAST_CANCER_MODEL_PATH",
-        os.path.join(
-            os.path.dirname(__file__),
-            "../data/Breast Cancer/Model/Breast Cancer.h5",
-        ),
-    )
+    BREAST_CANCER_MODEL_PATH = os.getenv("BREAST_CANCER_MODEL_PATH")
+    LYMPHOMA_MODEL_PATH = os.getenv("LYMPHOMA_MODEL_PATH")
+    PNEUMONIA_MODEL_PATH = os.getenv("PNEUMONIA_MODEL_PATH")
+    EYE_DISEASE_MODEL_PATH = os.getenv("EYE_DISEASE_MODEL_PATH")
 
 
 settings = Settings()

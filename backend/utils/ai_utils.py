@@ -13,9 +13,13 @@ from utils.custom_layers import EncoderBlock, DecoderBlock, AttentionGate
 from keras.metrics import MeanIoU
 import base64
 import io
+from tensorflow.keras.preprocessing import image as keras_image
 
 kidney_model = None  # Add this line at the top-level
 breast_cancer_model = None
+lymphoma_model = None
+pneumonia_model = None
+eye_disease_model = None
 
 
 def get_kidney_model():
@@ -129,5 +133,105 @@ def predict_breast_cancer_image(image_file):
 
         logging.getLogger("utils.ai_utils").error(
             f"Error in breast cancer image prediction: {e}"
+        )
+        return {"error": str(e)}
+
+
+def get_lymphoma_model():
+    global lymphoma_model
+    if lymphoma_model is None:
+        model_path = settings.LYMPHOMA_MODEL_PATH
+        if not os.path.exists(model_path):
+            raise FileNotFoundError(f"Model file not found at {model_path}")
+        lymphoma_model = load_model(model_path)
+    return lymphoma_model
+
+
+def predict_lymphoma(image_file):
+    class_labels = ["lymph_cll", "lymph_fl", "lymph_mcl"]
+    try:
+        # Read image from file-like object
+        img = keras_image.load_img(image_file, target_size=(224, 224))
+        img_array = keras_image.img_to_array(img) / 255.0
+        img_array = np.expand_dims(img_array, axis=0)
+        model = get_lymphoma_model()
+        prediction = model.predict(img_array)[0]
+        predicted_index = int(np.argmax(prediction))
+        predicted_label = class_labels[predicted_index]
+        confidence = float(prediction[predicted_index]) * 100
+        return {"predicted_class": predicted_label, "confidence": confidence}
+    except Exception as e:
+        import logging
+
+        logging.getLogger("utils.ai_utils").error(
+            f"Error in lymphoma image prediction: {e}"
+        )
+        return {"error": str(e)}
+
+
+def get_pneumonia_model():
+    global pneumonia_model
+    if pneumonia_model is None:
+        model_path = settings.PNEUMONIA_MODEL_PATH
+        if not os.path.exists(model_path):
+            raise FileNotFoundError(f"Model file not found at {model_path}")
+        pneumonia_model = load_model(model_path)
+    return pneumonia_model
+
+
+def predict_pneumonia(image_file):
+    class_labels = ["NORMAL", "PNEUMONIA"]
+    try:
+        img = keras_image.load_img(image_file, target_size=(224, 224))
+        img_array = keras_image.img_to_array(img) / 255.0
+        img_array = np.expand_dims(img_array, axis=0)
+        model = get_pneumonia_model()
+        prediction = model.predict(img_array)[0]
+        predicted_index = int(np.argmax(prediction))
+        predicted_label = class_labels[predicted_index]
+        confidence = float(prediction[predicted_index]) * 100
+        return {"predicted_class": predicted_label, "confidence": confidence}
+    except Exception as e:
+        import logging
+
+        logging.getLogger("utils.ai_utils").error(
+            f"Error in pneumonia image prediction: {e}"
+        )
+        return {"error": str(e)}
+
+
+def get_eye_disease_model():
+    global eye_disease_model
+    if eye_disease_model is None:
+        model_path = settings.EYE_DISEASE_MODEL_PATH
+        if not os.path.exists(model_path):
+            raise FileNotFoundError(f"Model file not found at {model_path}")
+        eye_disease_model = load_model(model_path)
+    return eye_disease_model
+
+
+def predict_eye_disease(image_file):
+    """
+    Placeholder function for eye disease prediction.
+    Implement the actual model loading and prediction logic here.
+    """
+    # This function should be implemented similarly to the other models
+    class_labels = ["Bulging_Eyes", "Cataracts", "Crossed_Eyes", "Glaucoma", "Uveitis"]
+
+    try:
+        img = keras_image.load_img(image_file, target_size=(224, 224))
+        img_array = keras_image.img_to_array(img) / 255.0
+        img_array = np.expand_dims(img_array, axis=0)
+        model = get_eye_disease_model()
+        prediction = model.predict(img_array)[0]
+        predicted_index = int(np.argmax(prediction))
+        predicted_label = class_labels[predicted_index]
+        confidence = float(prediction[predicted_index]) * 100
+        return {"predicted_class": predicted_label, "confidence": confidence}
+    except Exception as e:
+        import logging
+
+        logging.getLogger("utils.ai_utils").error(
+            f"Error in eye disease image prediction: {e}"
         )
         return {"error": str(e)}

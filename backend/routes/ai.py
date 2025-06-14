@@ -417,3 +417,84 @@ async def breast_cancer_image_classification(
         raise HTTPException(
             status_code=500, detail=f"Error in breast cancer image classification: {e}"
         )
+
+
+@router.post("/api/lymphoma-image-classification")
+async def lymphoma_image_classification(
+    image: UploadFile = File(...),
+    current_user: dict = Depends(get_current_user),
+):
+    """Classify lymphoma from an uploaded image using a Keras model."""
+    try:
+        if image.content_type not in ["image/jpeg", "image/png"]:
+            logger.error(f"Invalid file type: {image.content_type}")
+            raise HTTPException(
+                status_code=400, detail="Only JPEG or PNG images are supported."
+            )
+        image_data = await image.read()
+        from io import BytesIO
+
+        image_file = BytesIO(image_data)
+        result = predict_lymphoma(image_file)
+        if "error" in result:
+            raise HTTPException(status_code=500, detail=result["error"])
+        return result
+    except Exception as e:
+        logger.error(f"Error in lymphoma image classification: {e}")
+        raise HTTPException(
+            status_code=500, detail=f"Error in lymphoma image classification: {e}"
+        )
+
+
+@router.post("/api/pneumonia-image-classification")
+async def pneumonia_image_classification(
+    image: UploadFile = File(...),
+    current_user: dict = Depends(get_current_user),
+):
+    """Classify pneumonia from an uploaded image using a Keras model."""
+    try:
+        if image.content_type not in ["image/jpeg", "image/png"]:
+            logger.error(f"Invalid file type: {image.content_type}")
+            raise HTTPException(
+                status_code=400, detail="Only JPEG or PNG images are supported."
+            )
+        image_data = await image.read()
+        from io import BytesIO
+
+        image_file = BytesIO(image_data)
+        result = predict_pneumonia(image_file)
+        if "error" in result:
+            raise HTTPException(status_code=500, detail=result["error"])
+        return result
+    except Exception as e:
+        logger.error(f"Error in pneumonia image classification: {e}")
+        raise HTTPException(
+            status_code=500, detail=f"Error in pneumonia image classification: {e}"
+        )
+
+
+@router.post("/api/eye-disease-image-classification")
+async def eye_disease_image_classification(
+    image: UploadFile = File(...),
+    current_user: dict = Depends(get_current_user),
+):
+    """Classify eye disease from an uploaded image using a Keras model."""
+    try:
+        if image.content_type not in ["image/jpeg", "image/png"]:
+            logger.error(f"Invalid file type: {image.content_type}")
+            raise HTTPException(
+                status_code=400, detail="Only JPEG or PNG images are supported."
+            )
+        image_data = await image.read()
+        from io import BytesIO
+
+        image_file = BytesIO(image_data)
+        result = predict_eye_disease(image_file)
+        if "error" in result:
+            raise HTTPException(status_code=500, detail=result["error"])
+        return result
+    except Exception as e:
+        logger.error(f"Error in eye disease image classification: {e}")
+        raise HTTPException(
+            status_code=500, detail=f"Error in eye disease image classification: {e}"
+        )
