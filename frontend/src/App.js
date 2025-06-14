@@ -21,6 +21,9 @@ import MedicalHistoryPage from "./pages/MedicalHistoryPage";
 import HealthAnalyticsPage from "./pages/HealthAnalyticsPage";
 import KidneyDiseasePage from "./pages/KidneyDiseasePage";
 import BreastCancerPage from "./pages/BreastCancerPage";
+import PneumoniaPage from "./pages/PneumoniaPage";
+import LymphomaPage from "./pages/LymphomaPage";
+import EyeDiseasePage from "./pages/EyeDiseasePage";
 
 function App() {
   return (
@@ -49,6 +52,9 @@ function App() {
               <Route path="/health-analytics" element={<HealthAnalyticsPage />} />
               <Route path="/kidney-disease" element={<KidneyDiseasePage />} />
               <Route path="/breast-cancer" element={<BreastCancerPage />} />
+              <Route path="/pneumonia" element={<PneumoniaPage />} />
+              <Route path="/lymphoma" element={<LymphomaPage />} />
+              <Route path="/eye-disease" element={<EyeDiseasePage />} />
               {/* Redirect to home page for any unknown routes */}
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>

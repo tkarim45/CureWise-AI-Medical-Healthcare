@@ -40,18 +40,18 @@ const DashboardPage = () => {
 
   const aiDetectionFeatures = [
     {
-      title: "Eye Disease Detection",
+      title: "Lymphoma Detection",
       icon: <FaEye className="text-2xl" />,
-      path: "/eye-detection",
+      path: "/lymphoma",
       color: "bg-indigo-300 bg-opacity-50 text-indigo-900",
-      description: "Analyze eye images for diseases",
+      description: "Analyze lymph node images for diseases",
     },
     {
-      title: "Lung Cancer Detection",
+      title: "Pneumonia Detection",
       icon: <FaLungs className="text-2xl" />,
-      path: "/lung-detection",
+      path: "/pneumonia",
       color: "bg-red-300 bg-opacity-50 text-red-900",
-      description: "Screen lung CT scans for abnormalities",
+      description: "Screen chest X-ray images for pneumonia",
     },
     {
       title: "Breast Cancer Detection",
@@ -66,6 +66,13 @@ const DashboardPage = () => {
       path: "/kidney-disease",
       color: "bg-pink-300 bg-opacity-50 text-pink-900",
       description: "Analyze kidney images for diseases",
+    },
+    {
+      title: "Eye Disease Detection",
+      icon: <FaEye className="text-2xl" />,
+      path: "/eye-disease",
+      color: "bg-purple-300 bg-opacity-50 text-purple-900",
+      description: "Analyze eye images for diseases",
     },
   ];
 
