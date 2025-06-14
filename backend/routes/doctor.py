@@ -9,6 +9,7 @@ from models.schemas import (
     AppointmentResponse,
     MedicalHistoryResponse,
     MedicalHistorySummaryResponse,
+    MedicalHistoryCreate,  # <-- Add this import
     DoctorCreate,
     DoctorResponse,
     TimeSlotResponse,
@@ -750,3 +751,71 @@ async def get_health_analytics(current_user: dict = Depends(get_current_user)):
         "bloodSugar": 95,
         "trends": [70, 72, 74, 73, 71, 72, 72],
     }
+
+
+@router.post(
+    "/api/doctor/patient/{user_id}/history",
+    response_model=MedicalHistoryResponse,
+)
+async def add_patient_medical_history(
+    user_id: str,
+    history: MedicalHistoryCreate,
+    current_user: dict = Depends(get_current_user),
+):
+    if current_user["role"] != "doctor":
+        raise HTTPException(status_code=403, detail="Not authorized")
+
+    # Verify doctor has an appointment with this patient
+    conn = psycopg2.connect(
+        dbname=settings.DB_NAME,
+        user=settings.DB_USER,
+        password=settings.DB_PASSWORD,
+        host=settings.DB_HOST,
+        port=settings.DB_PORT,
+    )
+    c = conn.cursor()
+    c.execute(
+        """
+        SELECT id FROM appointments
+        WHERE doctor_id = %s AND user_id = %s AND status != 'cancelled'
+        """,
+        (current_user["user_id"], user_id),
+    )
+    if not c.fetchone():
+        conn.close()
+        raise HTTPException(
+            status_code=403, detail="No active appointments with this patient"
+        )
+
+    import uuid
+
+    now = datetime.now()
+    new_id = str(uuid.uuid4())
+    c.execute(
+        """
+        INSERT INTO medical_history (id, user_id, conditions, allergies, notes, updated_at, updated_by)
+        VALUES (%s, %s, %s, %s, %s, %s, %s)
+        RETURNING id, user_id, conditions, allergies, notes, updated_at, updated_by
+        """,
+        (
+            new_id,
+            user_id,
+            history.conditions,
+            history.allergies,
+            history.notes,
+            now,
+            history.updated_by,
+        ),
+    )
+    row = c.fetchone()
+    conn.commit()
+    conn.close()
+    return MedicalHistoryResponse(
+        id=row[0],
+        user_id=row[1],
+        conditions=row[2],
+        allergies=row[3],
+        notes=row[4],
+        updated_at=str(row[5]),
+        updated_by=row[6],
+    )

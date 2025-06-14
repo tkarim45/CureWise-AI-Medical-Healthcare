@@ -297,3 +297,61 @@ async def general_query(
     except Exception as e:
         logger.error(f"Error processing query: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/api/disease-followup")
+async def disease_followup(
+    request: dict = Body(...), current_user: dict = Depends(get_current_user)
+):
+    """Handle follow-up questions after disease detection and refer to a doctor if needed."""
+    question = request.get("question", "")
+    context = request.get("context", "")
+    if not question.strip():
+        raise HTTPException(status_code=400, detail="A non-empty question is required.")
+
+    # Use the agent to answer the follow-up question
+    agent_response = await appointment_booking_agent(question, current_user["user_id"])
+    answer = agent_response.get("response", "Sorry, I couldn't process your question.")
+
+    referral = None
+    # If answer is a list (doctors), treat as referral
+    if isinstance(answer, list) and answer:
+        doctor = answer[0]
+        referral = {
+            "name": doctor.get("username", "Doctor"),
+            "specialty": doctor.get("specialty", "Doctor"),
+            "contact": doctor.get("email", "N/A"),
+        }
+        answer_text = f"I recommend you consult {referral['name']} ({referral['specialty']}). Contact: {referral['contact']}"
+    elif isinstance(answer, str):
+        answer_text = answer
+        if any(
+            word in answer.lower()
+            for word in [
+                "see a doctor",
+                "consult a doctor",
+                "refer",
+                "urgent",
+                "specialist",
+            ]
+        ):
+            from utils.agents import database_knowledge_agent
+
+            department_info = database_knowledge_agent(context or question)
+            doctor = department_info.doctors[0] if department_info.doctors else None
+            if doctor:
+                referral = {
+                    "name": doctor["username"],
+                    "specialty": doctor.get("specialty", "Doctor"),
+                    "contact": doctor.get("email", "N/A"),
+                }
+            else:
+                referral = {
+                    "name": "Doctor (to be assigned)",
+                    "specialty": department_info.department_name or "General Medicine",
+                    "contact": "N/A",
+                }
+        answer_text = answer
+    else:
+        answer_text = str(answer)
+    return {"response": answer_text, "referral": referral}

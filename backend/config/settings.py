@@ -15,6 +15,8 @@ class Settings:
     ALLOWED_ORIGINS = ["http://localhost:3000"]
     GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
     PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
+    ZILLIZ_URI = os.getenv("ZILLIZ_URI")
+    ZILLIZ_TOKEN = os.getenv("ZILLIZ_TOKEN")
 
     # Email settings
     EMAIL_SENDER: str = os.getenv("EMAIL_SENDER")

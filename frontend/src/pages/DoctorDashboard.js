@@ -358,9 +358,51 @@ const DoctorDashboard = () => {
                                         </li>
                                       ))}
                                     </ul>
-                                  ) : (
-                                    <p className="text-gray-500">No medical history available.</p>
-                                  )}
+                                  ) : null}
+                                  {/* Add Patient History Form */}
+                                  <div className="mt-4 bg-white p-4 rounded shadow border border-gray-100">
+                                    <h4 className="font-semibold mb-2 text-primary-700">Add New Medical History</h4>
+                                    <form
+                                      onSubmit={async (e) => {
+                                        e.preventDefault();
+                                        const formData = new FormData(e.target);
+                                        const payload = {
+                                          conditions: formData.get("conditions"),
+                                          allergies: formData.get("allergies"),
+                                          notes: formData.get("notes"),
+                                          updated_by: user?.user_id,
+                                        };
+                                        const res = await fetch(`${API_URL}/api/doctor/patient/${appt.user_id}/history`, {
+                                          method: "POST",
+                                          headers: {
+                                            "Content-Type": "application/json",
+                                            Authorization: `Bearer ${token}`,
+                                          },
+                                          body: JSON.stringify(payload),
+                                        });
+                                        if (res.ok) {
+                                          const newRecord = await res.json();
+                                          // Update local state
+                                          appt._history = [newRecord, ...(appt._history || [])];
+                                          setTodayAppointments((prev) => prev.map((a) => (a.id === appt.id ? { ...a, _history: appt._history } : a)));
+                                          setWeekAppointments((prev) => prev.map((a) => (a.id === appt.id ? { ...a, _history: appt._history } : a)));
+                                          setNextWeekAppointments((prev) => prev.map((a) => (a.id === appt.id ? { ...a, _history: appt._history } : a)));
+                                          e.target.reset();
+                                        } else {
+                                          alert("Failed to add medical history.");
+                                        }
+                                      }}
+                                    >
+                                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <input name="conditions" placeholder="Conditions" className="border p-2 rounded" />
+                                        <input name="allergies" placeholder="Allergies" className="border p-2 rounded" />
+                                        <input name="notes" placeholder="Notes" className="border p-2 rounded" />
+                                      </div>
+                                      <button type="submit" className="mt-3 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                                        Add History
+                                      </button>
+                                    </form>
+                                  </div>
                                 </div>
                               </td>
                             </tr>
