@@ -13,3 +13,7 @@ backend/models/.DS_Store
 
 .DS_Store
 frontend/.DS_Store
+
+
+backend/data/Breast Cancer/Model
+backend/data/kidney_disease/Model
