@@ -32,5 +32,14 @@ class Settings:
     DB_HOST = os.getenv("DB_HOST")
     DB_PORT = os.getenv("DB_PORT")
 
+    KIDNEY_MODEL_PATH = os.getenv("KIDNEY_MODEL_PATH")
+    BREAST_CANCER_MODEL_PATH = os.getenv(
+        "BREAST_CANCER_MODEL_PATH",
+        os.path.join(
+            os.path.dirname(__file__),
+            "../data/Breast Cancer/Model/Breast Cancer.h5",
+        ),
+    )
+
 
 settings = Settings()

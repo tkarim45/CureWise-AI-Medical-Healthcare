@@ -54,18 +54,18 @@ const DashboardPage = () => {
       description: "Screen lung CT scans for abnormalities",
     },
     {
-      title: "Brain Tumor Analysis",
-      icon: <FaBrain className="text-2xl" />,
-      path: "/brain-analysis",
+      title: "Breast Cancer Detection",
+      icon: <FaHeartbeat className="text-2xl" />,
+      path: "/breast-cancer",
       color: "bg-blue-300 bg-opacity-50 text-blue-800",
-      description: "Detect tumors in brain MRI scans",
+      description: "Detect tumors in breast MRI scans",
     },
     {
-      title: "Heart Health Scan",
-      icon: <FaHeartbeat className="text-2xl" />,
-      path: "/heart-scan",
+      title: "Kidney Disease Detection",
+      icon: <FaLungs className="text-2xl" />,
+      path: "/kidney-disease",
       color: "bg-pink-300 bg-opacity-50 text-pink-900",
-      description: "Analyze ECG and heart-related data",
+      description: "Analyze kidney images for diseases",
     },
   ];
 

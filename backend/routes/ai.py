@@ -22,6 +22,14 @@ from fastapi import (
 import json
 from utils.agents import *
 import base64
+import numpy as np
+from PIL import Image
+from tensorflow.keras.models import load_model
+import tensorflow as tf
+import gc
+from config.settings import settings
+from utils.ai_utils import *
+from utils.ai_utils import predict_breast_cancer_image
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -355,3 +363,57 @@ async def disease_followup(
     else:
         answer_text = str(answer)
     return {"response": answer_text, "referral": referral}
+
+
+@router.post("/api/kidney-disease-image-classification")
+async def kidney_disease_image_classification(
+    image: UploadFile = File(...),
+    current_user: dict = Depends(get_current_user),
+):
+    """Classify kidney disease from an uploaded image using a Keras model."""
+    try:
+        if image.content_type not in ["image/jpeg", "image/png"]:
+            logger.error(f"Invalid file type: {image.content_type}")
+            raise HTTPException(
+                status_code=400, detail="Only JPEG or PNG images are supported."
+            )
+        image_data = await image.read()
+        from io import BytesIO
+
+        image_file = BytesIO(image_data)
+        result = predict_kidney_image(image_file)
+        if "error" in result:
+            raise HTTPException(status_code=500, detail=result["error"])
+        return result
+    except Exception as e:
+        logger.error(f"Error in kidney disease image classification: {e}")
+        raise HTTPException(
+            status_code=500, detail=f"Error in kidney disease image classification: {e}"
+        )
+
+
+@router.post("/api/breast-cancer-image-classification")
+async def breast_cancer_image_classification(
+    image: UploadFile = File(...),
+    current_user: dict = Depends(get_current_user),
+):
+    """Classify breast cancer from an uploaded image using a Keras model."""
+    try:
+        if image.content_type not in ["image/jpeg", "image/png"]:
+            logger.error(f"Invalid file type: {image.content_type}")
+            raise HTTPException(
+                status_code=400, detail="Only JPEG or PNG images are supported."
+            )
+        image_data = await image.read()
+        from io import BytesIO
+
+        image_file = BytesIO(image_data)
+        result = predict_breast_cancer_image(image_file)
+        if "error" in result:
+            raise HTTPException(status_code=500, detail=result["error"])
+        return result
+    except Exception as e:
+        logger.error(f"Error in breast cancer image classification: {e}")
+        raise HTTPException(
+            status_code=500, detail=f"Error in breast cancer image classification: {e}"
+        )
