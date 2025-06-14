@@ -17,3 +17,4 @@ frontend/.DS_Store
 
 backend/data/Breast Cancer/Model
 backend/data/kidney_disease/Model
+backend/utils/__pycache__/ai_utils.cpython-39.pyc
