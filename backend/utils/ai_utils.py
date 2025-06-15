@@ -14,6 +14,7 @@ from keras.metrics import MeanIoU
 import base64
 import io
 from tensorflow.keras.preprocessing import image as keras_image
+import google.generativeai as genai
 
 kidney_model = None  # Add this line at the top-level
 breast_cancer_model = None
@@ -235,3 +236,26 @@ def predict_eye_disease(image_file):
             f"Error in eye disease image prediction: {e}"
         )
         return {"error": str(e)}
+
+
+def get_gemini_model():
+    try:
+        model = genai.GenerativeModel("gemini-1.5-flash")
+        return model
+    except Exception as e:
+        logger.error(f"Error initializing Gemini model: {e}")
+        raise RuntimeError(f"Failed to initialize Gemini model: {e}")
+
+
+async def generate_gemini_response(prompt: str, system_prompt: str = None):
+    try:
+        model = get_gemini_model()
+        full_prompt = f"{system_prompt}\n\nUser query: {prompt}\n\nResponse:"
+        response = model.generate_content(full_prompt)
+        if hasattr(response, "text"):
+            return response.text
+        else:
+            return response.parts[0].text
+    except Exception as e:
+        logger.error(f"Error generating Gemini response: {e}")
+        raise Exception(f"Failed to generate response: {e}")

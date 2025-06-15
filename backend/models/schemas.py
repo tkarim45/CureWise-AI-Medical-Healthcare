@@ -250,3 +250,11 @@ class MedicalHistorySummaryRequest(BaseModel):
 
 class MedicalHistorySummaryResponse(BaseModel):
     summary: str
+
+
+class EyeDiseaseChatRequest(BaseModel):
+    message: str
+
+
+class EyeDiseaseChatResponse(BaseModel):
+    response: str

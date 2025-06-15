@@ -5,8 +5,8 @@ from langchain_core.prompts import ChatPromptTemplate
 from pydantic import BaseModel
 import re
 from config.settings import settings
-from utils.zillisutils import (
-    document_chain as retrieval_chain,
+from utils.pineconeutils import (
+    retrieval_chain,
     get_general_chat_history,
     store_general_chat_history,
 )

@@ -160,18 +160,20 @@ const GeneralQueryPage = () => {
       setChatHistory((prev) => [...prev, userMessage]);
       setQuery("");
 
-      // Call /api/medical-query API
-      const formData = new FormData();
-      formData.append("query", query);
+      // Call /api/general-query API
       const apiUrl = process.env.REACT_APP_API_URL || "";
       const token = localStorage.getItem("token");
-      const response = await axios.post(`${apiUrl}/api/medical-query`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        withCredentials: true,
-      });
+      const response = await axios.post(
+        `${apiUrl}/api/general-query`,
+        { query },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          withCredentials: true,
+        }
+      );
 
       // Add bot response
       const botMessage = {

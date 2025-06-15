@@ -30,6 +30,7 @@ import gc
 from config.settings import settings
 from utils.ai_utils import *
 from utils.ai_utils import predict_breast_cancer_image
+from utils.prompts import *
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -497,4 +498,104 @@ async def eye_disease_image_classification(
         logger.error(f"Error in eye disease image classification: {e}")
         raise HTTPException(
             status_code=500, detail=f"Error in eye disease image classification: {e}"
+        )
+
+
+@router.post("/api/eye-disease-chat", response_model=EyeDiseaseChatResponse)
+async def eye_disease_chat(
+    request: EyeDiseaseChatRequest, current_user: dict = Depends(get_current_user)
+):
+    """
+    Chatbot endpoint for eye disease questions using Gemini.
+    """
+    try:
+        logger.info(f"Received eye disease chat message: {request.message[:50]}...")
+        assistant_response = await generate_gemini_response(
+            request.message, system_prompt=EYE_DISEASE_PROMPT
+        )
+        return EyeDiseaseChatResponse(response=assistant_response)
+    except Exception as e:
+        logger.error(f"Error generating eye disease chat response: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Error generating response: {str(e)}"
+        )
+
+
+@router.post("/api/lymphoma-chat", response_model=EyeDiseaseChatResponse)
+async def lymphoma_chat(
+    request: EyeDiseaseChatRequest, current_user: dict = Depends(get_current_user)
+):
+    """
+    Chatbot endpoint for lymphoma questions using Gemini.
+    """
+    try:
+        logger.info(f"Received lymphoma chat message: {request.message[:50]}...")
+        assistant_response = await generate_gemini_response(
+            request.message, system_prompt=LYMPHOMA_DISEASE_PROMPT
+        )
+        return EyeDiseaseChatResponse(response=assistant_response)
+    except Exception as e:
+        logger.error(f"Error generating lymphoma chat response: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Error generating response: {str(e)}"
+        )
+
+
+@router.post("/api/pneumonia-chat", response_model=EyeDiseaseChatResponse)
+async def pneumonia_chat(
+    request: EyeDiseaseChatRequest, current_user: dict = Depends(get_current_user)
+):
+    """
+    Chatbot endpoint for pneumonia questions using Gemini.
+    """
+    try:
+        logger.info(f"Received pneumonia chat message: {request.message[:50]}...")
+        assistant_response = await generate_gemini_response(
+            request.message, system_prompt=PNEUMONIA_PROMPT
+        )
+        return EyeDiseaseChatResponse(response=assistant_response)
+    except Exception as e:
+        logger.error(f"Error generating pneumonia chat response: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Error generating response: {str(e)}"
+        )
+
+
+@router.post("/api/breast-cancer-chat", response_model=EyeDiseaseChatResponse)
+async def breast_cancer_chat(
+    request: EyeDiseaseChatRequest, current_user: dict = Depends(get_current_user)
+):
+    """
+    Chatbot endpoint for breast cancer questions using Gemini.
+    """
+    try:
+        logger.info(f"Received breast cancer chat message: {request.message[:50]}...")
+        assistant_response = await generate_gemini_response(
+            request.message, system_prompt=BREAST_CANCER_PROMPT
+        )
+        return EyeDiseaseChatResponse(response=assistant_response)
+    except Exception as e:
+        logger.error(f"Error generating breast cancer chat response: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Error generating response: {str(e)}"
+        )
+
+
+@router.post("/api/kidney-disease-chat", response_model=EyeDiseaseChatResponse)
+async def kidney_disease_chat(
+    request: EyeDiseaseChatRequest, current_user: dict = Depends(get_current_user)
+):
+    """
+    Chatbot endpoint for kidney disease questions using Gemini.
+    """
+    try:
+        logger.info(f"Received kidney disease chat message: {request.message[:50]}...")
+        assistant_response = await generate_gemini_response(
+            request.message, system_prompt=KIDNEY_DISEASE_PROMPT
+        )
+        return EyeDiseaseChatResponse(response=assistant_response)
+    except Exception as e:
+        logger.error(f"Error generating kidney disease chat response: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Error generating response: {str(e)}"
         )

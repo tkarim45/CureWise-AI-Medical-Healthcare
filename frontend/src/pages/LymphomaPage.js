@@ -2,6 +2,9 @@ import React, { useState, useRef } from "react";
 import { useAuth } from "../context/AuthContext";
 import NavBar from "../components/layout/NavBar";
 import { CloudArrowUpIcon, ArrowPathIcon, XMarkIcon, InformationCircleIcon } from "@heroicons/react/24/solid";
+import { RiRobot2Line } from "react-icons/ri";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 const API_URL = process.env.REACT_APP_API_URL || "";
 
@@ -12,6 +15,8 @@ const LymphomaPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showInfo, setShowInfo] = useState(false);
+  const [chatInput, setChatInput] = useState("");
+  const [chatHistory, setChatHistory] = useState([]);
   const { token } = useAuth();
   const fileInputRef = useRef();
 
@@ -66,19 +71,40 @@ const LymphomaPage = () => {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
+  const handleChatSubmit = async (e) => {
+    e.preventDefault();
+    if (!chatInput.trim()) return;
+    const userMsg = { role: "user", content: chatInput, timestamp: new Date().toLocaleTimeString() };
+    setChatHistory((prev) => [...prev, userMsg]);
+    setChatInput("");
+    try {
+      const response = await fetch(`${API_URL}/api/lymphoma-chat`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        credentials: "include",
+        body: JSON.stringify({ message: userMsg.content }),
+      });
+      if (!response.ok) throw new Error("Failed to get AI response");
+      const data = await response.json();
+      setChatHistory((prev) => [...prev, { role: "assistant", content: data.response, timestamp: new Date().toLocaleTimeString() }]);
+    } catch (err) {
+      setChatHistory((prev) => [...prev, { role: "assistant", content: "Sorry, I couldn't process your question.", timestamp: new Date().toLocaleTimeString() }]);
+    }
+  };
+
   return (
     <>
       <NavBar />
       <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-10">
-            <h1 className="text-3xl font-bold text-gray-900 mb-3">Lymphoma Classification</h1>
-            <p className="text-lg text-gray-600">Upload a lymph node image for AI-powered lymphoma subtype prediction.</p>
-          </div>
+        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Image Analysis Section */}
           <div className="bg-white shadow-xl rounded-lg overflow-hidden">
             <div className="p-6 border-b border-gray-200">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold text-gray-800">Image Upload</h2>
+                <h2 className="text-xl font-semibold text-gray-800">Lymphoma Disease Detection</h2>
                 <button onClick={() => setShowInfo(!showInfo)} className="text-blue-600 hover:text-blue-800 flex items-center gap-1">
                   <InformationCircleIcon className="h-5 w-5" />
                   <span>How it works</span>
@@ -86,8 +112,8 @@ const LymphomaPage = () => {
               </div>
               {showInfo && (
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                  <h3 className="font-medium text-blue-800 mb-2">About Lymphoma Classification</h3>
-                  <p className="text-sm text-blue-700">Our AI analyzes lymph node images to classify lymphoma subtypes. Upload clear, high-quality images for best results. This tool assists healthcare professionals but does not replace medical diagnosis.</p>
+                  <h3 className="font-medium text-blue-800 mb-2">About Lymphoma Detection</h3>
+                  <p className="text-sm text-blue-700">Our AI analyzes images to detect potential lymphoma. Upload clear, high-quality images for best results. This tool assists healthcare professionals but does not replace medical diagnosis.</p>
                 </div>
               )}
               <div className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${preview ? "border-transparent" : "border-gray-300 hover:border-blue-400"}`} onClick={() => !preview && fileInputRef.current.click()}>
@@ -110,7 +136,7 @@ const LymphomaPage = () => {
                     <p className="text-gray-500">
                       Click to upload or drag and drop
                       <br />
-                      <span className="text-sm text-gray-400">Lymph node images</span>
+                      <span className="text-sm text-gray-400">Lymphoma images (lymph nodes, etc.)</span>
                     </p>
                   </>
                 )}
@@ -133,7 +159,9 @@ const LymphomaPage = () => {
                 </button>
               </div>
             </div>
-            <div className="p-6">
+
+            {/* Results Section */}
+            <div className="p-6 bg-gray-50">
               <h2 className="text-xl font-semibold text-gray-800 mb-4">Analysis Results</h2>
               {error && (
                 <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
@@ -148,25 +176,25 @@ const LymphomaPage = () => {
                 </div>
               )}
               {result ? (
-                <div className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="bg-gray-50 rounded-lg p-4">
-                      <h3 className="font-medium text-gray-700 mb-2">Prediction</h3>
-                      <div className="text-2xl font-bold text-gray-900 capitalize">{result.predicted_class.replace(/_/g, " ")}</div>
-                    </div>
-                    <div className="bg-gray-50 rounded-lg p-4">
-                      <h3 className="font-medium text-gray-700 mb-2">Confidence Level</h3>
+                <div className="space-y-4">
+                  <div className="bg-white rounded-lg shadow-sm p-4">
+                    <h3 className="font-medium text-gray-700 mb-2">Prediction</h3>
+                    <div className="text-2xl font-bold text-blue-600 capitalize">{result.predicted_class.replace(/_/g, " ")}</div>
+                  </div>
+                  {result.confidence !== undefined && (
+                    <div className="bg-white rounded-lg shadow-sm p-4">
+                      <h3 className="font-medium text-gray-700 mb-3">Confidence Level</h3>
                       <div className="flex items-center">
-                        <div className="w-full bg-gray-200 rounded-full h-4">
-                          <div className="bg-blue-600 h-4 rounded-full" style={{ width: `${Math.max(0, Math.min(result.confidence / 100, 1)) * 100}%` }}></div>
+                        <div className="w-full bg-gray-200 rounded-full h-2.5">
+                          <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: `${Math.max(0, Math.min(result.confidence / 100, 1)) * 100}%` }}></div>
                         </div>
                         <span className="ml-3 text-gray-900 font-medium">{Math.max(0, Math.min(result.confidence, 100)).toFixed(1)}%</span>
                       </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               ) : (
-                <div className="text-center py-12 bg-gray-50 rounded-lg">
+                <div className="text-center py-8 bg-white rounded-lg shadow-sm">
                   <div className="mx-auto h-12 w-12 text-gray-400 mb-3">
                     <InformationCircleIcon className="h-full w-full" />
                   </div>
@@ -176,16 +204,96 @@ const LymphomaPage = () => {
               )}
             </div>
           </div>
-          <div className="mt-8 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded">
-            <div className="flex">
-              <div className="flex-shrink-0">
-                <InformationCircleIcon className="h-5 w-5 text-yellow-500" />
-              </div>
-              <div className="ml-3">
-                <p className="text-sm text-yellow-700">
-                  <strong>Important:</strong> This tool provides preliminary analysis only and is not a substitute for professional medical advice, diagnosis, or treatment. Always consult with a qualified healthcare provider regarding any medical condition.
-                </p>
-              </div>
+
+          {/* Chat Assistant Section */}
+          <div className="bg-white shadow-xl rounded-lg overflow-hidden flex flex-col">
+            <div className="p-6 border-b border-gray-200">
+              <h2 className="text-xl font-semibold text-gray-800 mb-2">Lymphoma Assistant</h2>
+              <p className="text-sm text-gray-500 mb-4">Ask questions about lymphoma conditions, symptoms, or treatments</p>
+
+              <form onSubmit={handleChatSubmit} className="flex gap-2 mb-4">
+                <input type="text" value={chatInput} onChange={(e) => setChatInput(e.target.value)} placeholder="Ask about lymphoma symptoms, conditions, treatments..." className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" disabled={loading} />
+                <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2" disabled={!chatInput.trim() || loading}>
+                  {loading ? <ArrowPathIcon className="h-4 w-4 animate-spin" /> : <RiRobot2Line className="h-4 w-4" />}
+                  <span>Ask</span>
+                </button>
+              </form>
+            </div>
+
+            <div className="flex-1 p-4 bg-gray-50 overflow-y-auto max-h-[500px]">
+              {chatHistory.length === 0 ? (
+                <div className="h-full flex flex-col items-center justify-center text-center p-8">
+                  <RiRobot2Line className="h-12 w-12 text-blue-400 mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900">How can I help you today?</h3>
+                  <p className="mt-2 text-sm text-gray-500">Ask me anything about lymphoma diseases, symptoms, or treatments.</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {chatHistory.map((msg, idx) => (
+                    <div key={idx} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+                      <div className={`max-w-[85%] ${msg.role === "user" ? "ml-auto" : ""}`}>
+                        <div className={`p-4 rounded-lg shadow-sm ${msg.role === "user" ? "bg-blue-600 text-white" : "bg-white border border-gray-200"}`}>
+                          <div className="flex items-center mb-2">
+                            {msg.role === "assistant" ? <RiRobot2Line className="mr-2 text-blue-500" /> : <span className="mr-2 font-bold">You</span>}
+                            <span className="text-xs opacity-80">{msg.timestamp}</span>
+                          </div>
+                          <div className="whitespace-pre-line">
+                            <ReactMarkdown
+                              children={msg.content}
+                              remarkPlugins={[remarkGfm]}
+                              components={{
+                                strong: ({ node, ...props }) => <strong className={`font-semibold ${msg.role === "user" ? "text-blue-100" : "text-blue-700"}`} {...props} />,
+                                li: ({ node, ...props }) => <li className="ml-4 list-disc" {...props} />,
+                                ul: ({ node, ...props }) => <ul className="mb-2 pl-4" {...props} />,
+                                h2: ({ node, ...props }) => {
+                                  const children = props.children && React.Children.count(props.children) > 0 ? props.children : <span className="sr-only">Section heading</span>;
+                                  return (
+                                    <h2 className={`text-lg font-bold mt-4 mb-2 ${msg.role === "user" ? "text-blue-100" : "text-blue-800"}`} aria-label={typeof props.children === "string" && props.children.trim() === "" ? "Section heading" : undefined}>
+                                      {children}
+                                    </h2>
+                                  );
+                                },
+                                h3: ({ node, ...props }) => {
+                                  const children = props.children && React.Children.count(props.children) > 0 ? props.children : <span className="sr-only">Section heading</span>;
+                                  return (
+                                    <h3 className={`text-base font-semibold mt-3 mb-1 ${msg.role === "user" ? "text-blue-100" : "text-blue-700"}`} aria-label={typeof props.children === "string" && props.children.trim() === "" ? "Section heading" : undefined}>
+                                      {children}
+                                    </h3>
+                                  );
+                                },
+                                p: ({ node, ...props }) => <p className="mb-2" {...props} />,
+                                a: ({ node, ...props }) => {
+                                  // Ensure anchor has accessible content
+                                  const children = props.children && React.Children.count(props.children) > 0 ? props.children : <span className="sr-only">Link</span>;
+                                  return (
+                                    <a className={`underline ${msg.role === "user" ? "text-blue-200" : "text-blue-600"}`} {...props} aria-label={!props.children || (typeof props.children === "string" && props.children.trim() === "") ? "Link" : undefined}>
+                                      {children}
+                                    </a>
+                                  );
+                                },
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Disclaimer */}
+        <div className="mt-8 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded max-w-6xl mx-auto">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <InformationCircleIcon className="h-5 w-5 text-yellow-500" />
+            </div>
+            <div className="ml-3">
+              <p className="text-sm text-yellow-700">
+                <strong>Important:</strong> This tool provides preliminary analysis only and is not a substitute for professional medical advice, diagnosis, or treatment. Always consult with a qualified healthcare provider regarding any medical condition.
+              </p>
             </div>
           </div>
         </div>
