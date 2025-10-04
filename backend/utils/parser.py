@@ -3,7 +3,7 @@ import json
 import re
 import logging
 from llama_cloud_services import LlamaParse
-from groq import Groq
+from openai import OpenAI
 from dotenv import load_dotenv
 from fastapi import HTTPException
 from datetime import datetime, timedelta
@@ -16,11 +16,11 @@ logger = logging.getLogger(__name__)
 
 load_dotenv()
 
-# Initialize LlamaParse and Groq
+# Initialize LlamaParse and OpenAI
 LLAMA_PARSER_API_KEY = os.getenv("LLAMA_PARSER_API_KEY")
 
 parser = LlamaParse(api_key=LLAMA_PARSER_API_KEY, result_type="markdown")
-client = Groq(api_key=settings.GROQ_API_KEY)
+client = OpenAI(api_key=settings.OPENAI_API_KEY)
 
 # In-memory conversation history: {user_id: [{"query": str, "report_json": str, "response": str, "timestamp": datetime}, ...]}
 conversation_history = defaultdict(list)
@@ -117,32 +117,25 @@ Exclude empty entries and non-test data. Ensure the JSON is well-structured. Her
         },
     ]
 
-    logger.info("Sending structure request to Groq")
-    response = (
-        client.chat.completions.create(
-            messages=generation_chat_history, model="llama3-70b-8192"
-        )
-        .choices[0]
-        .message.content
-    )
-    logger.info(f"Received structure response: {response[:100]}...")
-
-    json_match = re.search(r"```json\s*(.*?)\s*```", response, re.DOTALL)
-    if json_match:
-        json_str = json_match.group(1)
-    else:
-        json_str = response
-
+    logger.info("Sending structure request to OpenAI")
     try:
-        json_output = json.loads(json_str)
-        logger.info("Structured report JSON parsed successfully")
-        return json_output, generation_chat_history + [
-            {"role": "assistant", "content": response}
-        ]
-    except json.JSONDecodeError as e:
-        logger.error(f"Invalid JSON response from Groq: {str(e)}")
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",  # Using GPT-4 for accurate medical data parsing
+            messages=generation_chat_history,
+            temperature=0.1,  # Low temperature for consistent structured output
+            response_format={"type": "json_object"},  # Ensure JSON output
+        )
+
+        # Extract JSON from response
+        response_text = response.choices[0].message.content
+        json_output = json.loads(response_text)
+
+        return json_output, response_text
+
+    except Exception as e:
+        logger.error(f"Error in structure_report: {str(e)}")
         raise HTTPException(
-            status_code=500, detail=f"Invalid JSON response from Groq: {str(e)}"
+            status_code=500, detail=f"Error structuring report: {str(e)}"
         )
 
 

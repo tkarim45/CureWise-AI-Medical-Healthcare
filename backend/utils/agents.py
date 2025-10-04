@@ -1,6 +1,5 @@
 import psycopg2
 from typing import List, Dict, Optional, Callable
-from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
 from pydantic import BaseModel
 import re
@@ -15,16 +14,14 @@ import uuid
 import logging
 import json
 import asyncio
-
-# Assuming send_confirmation_email is defined elsewhere and imported
-from utils.email import (
-    send_confirmation_email,
-)  # Adjust import based on your project structure
+import openai
+from openai import OpenAI
+from utils.email import send_confirmation_email
 
 logger = logging.getLogger(__name__)
 
-# Initialize LLM
-llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash-latest", temperature=0.3)
+# Initialize OpenAI client
+openai_client = OpenAI(api_key=settings.OPENAI_API_KEY)
 
 
 # Define tools
@@ -489,11 +486,22 @@ def database_knowledge_agent(condition: str) -> DatabaseKnowledgeResponse:
         """
     )
     try:
-        response = llm.invoke(
-            prompt.format(condition=condition, departments=", ".join(departments))
+        formatted_prompt = prompt.format(
+            condition=condition, departments=", ".join(departments)
         )
-        logger.debug(f"DatabaseKnowledgeAgent LLM raw response: {response.content}")
-        cleaned_response = re.sub(r"```json\s*|\s*```", "", response.content).strip()
+        chat_completion = openai_client.chat.completions.create(
+            messages=[
+                {
+                    "role": "user",
+                    "content": formatted_prompt,
+                }
+            ],
+            model="gpt-4o-mini",
+            temperature=0.3,
+        )
+        response = chat_completion.choices[0].message.content
+        logger.debug(f"DatabaseKnowledgeAgent OpenAI raw response: {response}")
+        cleaned_response = re.sub(r"```json\s*|\s*```", "", response).strip()
         result = json.loads(cleaned_response)
         department_name = result.get("department_name")
     except json.JSONDecodeError as e:
@@ -625,21 +633,37 @@ def router_agent(query: str, user_id: str) -> RouterResponse:
         **Output (valid JSON only, no markdown):**
         """
     )
+    cleaned_response = None
     try:
-        response = llm.invoke(
-            prompt.format(query=query, departments=", ".join(departments))
+        # Call OpenAI API
+        formatted_prompt = prompt.format(
+            query=query, departments=", ".join(departments)
         )
-        logger.debug(f"RouterAgent LLM raw response: {response.content}")
-        cleaned_response = re.sub(r"```json\s*|\s*```", "", response.content).strip()
+        chat_completion = openai_client.chat.completions.create(
+            messages=[
+                {
+                    "role": "user",
+                    "content": formatted_prompt,
+                }
+            ],
+            model="gpt-4o-mini",
+            temperature=0.3,
+        )
+
+        response = chat_completion.choices[0].message.content
+        logger.debug(f"RouterAgent OpenAI raw response: {response}")
+        cleaned_response = re.sub(r"```json\s*|\s*```", "", response).strip()
         result = json.loads(cleaned_response)
         return RouterResponse(**result)
     except json.JSONDecodeError as e:
         logger.error(
-            f"RouterAgent failed to parse LLM response: {cleaned_response}, error: {e}"
+            f"RouterAgent failed to parse LLM response: {cleaned_response or 'No response'}, error: {e}"
         )
         return RouterResponse(action="rag_query", parameters={"query": query})
     except Exception as e:
-        logger.error(f"RouterAgent error: {e}, LLM response: {cleaned_response}")
+        logger.error(
+            f"RouterAgent error: {e}, LLM response: {cleaned_response or 'No response'}"
+        )
         return RouterResponse(action="rag_query", parameters={"query": query})
 
 

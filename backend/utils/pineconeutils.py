@@ -3,7 +3,7 @@ import os
 import time
 import gc
 from langchain_core.documents import Document
-from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGenerativeAI
+from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.prompts import ChatPromptTemplate
@@ -22,21 +22,26 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # --- RAG System Configuration ---
-PATIENT_COL = "Patient"
-DOCTOR_COL = "Doctor"
-DESCRIPTION_COL = "Description"
-PINECONE_INDEX_NAME = "medical-conversations-rag"
-EMBEDDING_DIMENSION = 768
-BATCH_SIZE = 1000
-SUB_BATCH_SIZE = 100
-TOTAL_ROWS = 200000
-START_ROW = 0
+PINECONE_INDEX_NAME = "curewise-medical-rag"
+EMBED_MODEL = "text-embedding-3-small"  # OpenAI embedding model
+EMBEDDING_DIMENSION = 1536  # matches text-embedding-3-small
 
-# Set API keys (should be in environment variables or settings)
-os.environ["GOOGLE_API_KEY"] = settings.GOOGLE_API_KEY  # Ensure this is set in settings
-os.environ["PINECONE_API_KEY"] = (
-    settings.PINECONE_API_KEY
-)  # Ensure this is set in settings
+# Set API keys (ensure these are set in your settings/env)
+os.environ["OPENAI_API_KEY"] = settings.OPENAI_API_KEY
+os.environ["PINECONE_API_KEY"] = settings.PINECONE_API_KEY
+
+
+# Function to get vector count
+def get_vector_count(index):
+    try:
+        stats = index.describe_index_stats()
+        count = stats["total_vector_count"]
+        logger.info(f"Found {count} vectors in index stats")
+        return count
+    except Exception as e:
+        logger.error(f"Error getting vector count: {str(e)}")
+        return 0
+
 
 # Initialize RAG components globally
 embeddings_model = None
@@ -49,12 +54,13 @@ def initialize_rag_system():
     try:
         logger.info("Initializing RAG system...")
 
-        # Initialize Embedding Model
-        embeddings_model = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
+        # ✅ Initialize Embedding Model
+        embeddings_model = OpenAIEmbeddings(model=EMBED_MODEL)
         logger.info("Embedding model initialized.")
 
-        # Initialize Pinecone
+        # ✅ Initialize Pinecone
         pc = Pinecone(api_key=os.environ["PINECONE_API_KEY"])
+
         index_names = pc.list_indexes().names()
         if PINECONE_INDEX_NAME not in index_names:
             logger.info(f"Creating Pinecone index '{PINECONE_INDEX_NAME}'...")
@@ -64,46 +70,49 @@ def initialize_rag_system():
                 metric="cosine",
                 spec=ServerlessSpec(cloud="aws", region="us-east-1"),
             )
+            logger.info("⏳ Waiting for index to be ready...")
             while not pc.describe_index(PINECONE_INDEX_NAME).status["ready"]:
                 time.sleep(5)
-            logger.info("Index created.")
+            logger.info("✅ Index created.")
         else:
             logger.info(f"Using existing index '{PINECONE_INDEX_NAME}'.")
 
+        # Initialize index
         index = pc.Index(PINECONE_INDEX_NAME)
-        logger.info(
-            f"Connected to index. Initial vector count: {index.describe_index_stats().total_vector_count}"
-        )
+        logger.info("Checking index status...")
 
-        # Load data into Pinecone if index is empty
+        # Get vector count
+        # Get vector count
+        vector_count = get_vector_count(index)
+        logger.info(f"Connected to index. Current vector count: {vector_count}")
+
+        # ✅ LangChain VectorStore Wrapper
         vector_store = PineconeVectorStore(
             index_name=PINECONE_INDEX_NAME, embedding=embeddings_model
         )
 
-        # Initialize LLM and RAG Chain
-        llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash-latest", temperature=0.3)
+        # ✅ Initialize LLM (OpenAI Chat Model)
+        llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.3)
         logger.info("LLM initialized.")
 
         retriever = vector_store.as_retriever(
-            search_type="similarity", search_kwargs={"k": 3}
+            search_type="similarity", search_kwargs={"k": 10}
         )
         prompt_template = ChatPromptTemplate.from_template(
             """
-                **Note:** You are an AI assistant using only the provided context from a dataset of patient-doctor conversations. You are not a doctor. Do not provide medical advice beyond the context. If the context lacks information, say so. Use the conversation history to understand references (e.g., pronouns like 'it') if relevant.
+            You are an AI medical assistant. 
+            Use ONLY the provided context from the dataset. 
+            Do not make up facts. 
+            If the context does not contain the answer, say so clearly.
 
-                **Conversation History (Recent Queries and Answers):**
-                {history}
+            **Context:**
+            {context}
 
-                **Context (from dataset):**
-                {context}
+            **Question:**
+            {input}
 
-                **Question:**
-                {input}
-
-                **Answer (based only on context, using history for clarity if needed):**
-                If the question is about hospitals, doctors, or appointments, respond: "Please use the appointment booking system for this query."
-                Otherwise, provide an answer based on the context.
-                """
+            **Answer (based only on context):**
+            """
         )
         document_chain = create_stuff_documents_chain(llm, prompt_template)
         retrieval_chain = create_retrieval_chain(retriever, document_chain)
@@ -114,10 +123,11 @@ def initialize_rag_system():
         raise Exception(f"RAG initialization failed: {e}")
 
 
-# Initialize RAG system on startup
+# ✅ Initialize RAG system on startup
 initialize_rag_system()
 
 
+# --- DB Connection ---
 def get_db_connection():
     return psycopg2.connect(
         dbname=settings.DB_NAME,
@@ -128,7 +138,7 @@ def get_db_connection():
     )
 
 
-# --- Chat History Storage for General Queries ---
+# --- Chat History Storage ---
 def store_general_chat_history(user_id: str, query: str, response: str):
     """Store general query chat history in PostgreSQL."""
     conn = get_db_connection()

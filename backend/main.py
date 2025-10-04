@@ -45,7 +45,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "https://*.ngrok-free.app"],
+    allow_origins=["http://localhost:3000", "https://jp009mvf-3000.inc1.devtunnels.ms"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -238,24 +238,47 @@ def predict_eye_disease(image_file):
         return {"error": str(e)}
 
 
-def get_gemini_model():
+async def generate_groq_response(prompt: str, system_prompt: str = None):
     try:
-        model = genai.GenerativeModel("gemini-1.5-flash")
-        return model
-    except Exception as e:
-        logger.error(f"Error initializing Gemini model: {e}")
-        raise RuntimeError(f"Failed to initialize Gemini model: {e}")
+        from config.settings import settings
+        from groq import Groq
 
-
-async def generate_gemini_response(prompt: str, system_prompt: str = None):
-    try:
-        model = get_gemini_model()
         full_prompt = f"{system_prompt}\n\nUser query: {prompt}\n\nResponse:"
-        response = model.generate_content(full_prompt)
-        if hasattr(response, "text"):
-            return response.text
-        else:
-            return response.parts[0].text
+
+        # Initialize Groq client
+        client = Groq(api_key=settings.GROQ_API_KEY)
+
+        # Call Groq API
+        chat_completion = client.chat.completions.create(
+            messages=[
+                {
+                    "role": "user",
+                    "content": full_prompt,
+                }
+            ],
+            model="llama-3.3-70b-versatile",
+            stream=False,
+        )
+
+        # Extract the response
+        response = chat_completion.choices[0].message.content
+        if not response:
+            raise Exception("No content in Groq API response")
+
+        # Clean the response
+        cleaned_response = response.strip()
+        cleaned_response = re.sub(
+            r"^(assistant:|[\[\{]?(ANSWER|RESPONSE)[\]\}]?:?\s*)",
+            "",
+            cleaned_response,
+            flags=re.IGNORECASE,
+        )
+        cleaned_response = re.sub(
+            r"```(?:json)?\s*(.*?)\s*```", r"\1", cleaned_response, flags=re.DOTALL
+        )
+        cleaned_response = re.sub(r"\s*(</s>|[EOT]|\[.*?\])$", "", cleaned_response)
+
+        return cleaned_response.strip()
     except Exception as e:
-        logger.error(f"Error generating Gemini response: {e}")
+        logger.error(f"Error generating response: {e}")
         raise Exception(f"Failed to generate response: {e}")

@@ -11,6 +11,7 @@ import os
 import asyncio
 import re
 from utils.parser import *
+from openai import OpenAI
 from fastapi import (
     HTTPException,
     Depends,
@@ -29,8 +30,13 @@ import tensorflow as tf
 import gc
 from config.settings import settings
 from utils.ai_utils import *
-from utils.ai_utils import predict_breast_cancer_image
+from utils.ai_utils import predict_breast_cancer_image, generate_groq_response
 from utils.prompts import *
+import re
+
+# Validate OpenAI API key
+if not settings.OPENAI_API_KEY:
+    raise ValueError("OpenAI API key is not set in environment variables")
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -163,14 +169,20 @@ async def medical_query(
             logger.info(f"Effective query for follow-up: {effective_query}")
 
         prompt = f"""
-            You are a friendly medical AI assistant who analyzes Complete Blood Count (CBC) results and answers medical questions in simple, kind words for non-experts. Follow these guidelines:
-            1. Keep answers 100-150 words, clear, and focused.
-            2. Use analogies (e.g., "Red blood cells are like delivery trucks carrying oxygen").
-            3. Avoid medical jargon; explain terms simply.
-            4. Suggest 1-2 next steps (e.g., "Discuss with your doctor about possible iron supplements").
-            5. Highlight urgency (e.g., "If you feel very weak or dizzy, see a doctor right away").
-            6. Emphasize this is not a diagnosis and recommend consulting a doctor.
-            7. Output only the answer text, without labels like "assistant:" or code blocks.
+            Analyze the blood test results and answer questions using these guidelines:
+            1. Keep answers concise (100-150 words) and easy to understand.
+            2. Use simple analogies to explain medical concepts.
+            3. Break down medical terms into plain language.
+            4. If values are abnormal:
+               - Explain what they mean
+               - Discuss possible causes
+               - Suggest reasonable next steps
+            5. For concerning values, indicate urgency level (routine/moderate/immediate attention).
+            6. Always remind that this is for informational purposes, not a diagnosis.
+            7. Format in clear sections:
+               - Summary of findings
+               - Explanation of key values
+               - Recommendations
 
             For CBC analysis, focus on:
             - Red blood cell count (RBC), hemoglobin, hematocrit (normal ranges: males 4.5-6.1 million/mcL, 13-17 g/dL, 40-55%; females 4.0-5.4 million/mcL, 11.5-15.5 g/dL, 36-48%).
@@ -197,17 +209,21 @@ async def medical_query(
             prompt += "\nNo blood test results available."
 
         logger.info(f"Sending prompt to Groq API: {prompt[:100]}...")
-        # Call Groq API
-        client = Groq(api_key=settings.GROQ_API_KEY)
+        # Call OpenAI API
+        client = OpenAI(api_key=settings.OPENAI_API_KEY)
         chat_completion = client.chat.completions.create(
             messages=[
                 {
+                    "role": "system",
+                    "content": "You are an expert medical professional specialized in analyzing blood test results and explaining them in simple terms.",
+                },
+                {
                     "role": "user",
                     "content": prompt,
-                }
+                },
             ],
-            model="llama-3.3-70b-versatile",
-            stream=False,
+            model="gpt-4o-mini",  # Using GPT-4 for medical analysis
+            temperature=0.3,  # Lower temperature for more factual responses
         )
 
         # Extract the response
@@ -510,7 +526,7 @@ async def eye_disease_chat(
     """
     try:
         logger.info(f"Received eye disease chat message: {request.message[:50]}...")
-        assistant_response = await generate_gemini_response(
+        assistant_response = await generate_groq_response(
             request.message, system_prompt=EYE_DISEASE_PROMPT
         )
         return EyeDiseaseChatResponse(response=assistant_response)
@@ -530,7 +546,7 @@ async def lymphoma_chat(
     """
     try:
         logger.info(f"Received lymphoma chat message: {request.message[:50]}...")
-        assistant_response = await generate_gemini_response(
+        assistant_response = await generate_groq_response(
             request.message, system_prompt=LYMPHOMA_DISEASE_PROMPT
         )
         return EyeDiseaseChatResponse(response=assistant_response)
@@ -550,7 +566,7 @@ async def pneumonia_chat(
     """
     try:
         logger.info(f"Received pneumonia chat message: {request.message[:50]}...")
-        assistant_response = await generate_gemini_response(
+        assistant_response = await generate_groq_response(
             request.message, system_prompt=PNEUMONIA_PROMPT
         )
         return EyeDiseaseChatResponse(response=assistant_response)
@@ -570,7 +586,7 @@ async def breast_cancer_chat(
     """
     try:
         logger.info(f"Received breast cancer chat message: {request.message[:50]}...")
-        assistant_response = await generate_gemini_response(
+        assistant_response = await generate_groq_response(
             request.message, system_prompt=BREAST_CANCER_PROMPT
         )
         return EyeDiseaseChatResponse(response=assistant_response)
@@ -590,7 +606,7 @@ async def kidney_disease_chat(
     """
     try:
         logger.info(f"Received kidney disease chat message: {request.message[:50]}...")
-        assistant_response = await generate_gemini_response(
+        assistant_response = await generate_groq_response(
             request.message, system_prompt=KIDNEY_DISEASE_PROMPT
         )
         return EyeDiseaseChatResponse(response=assistant_response)
