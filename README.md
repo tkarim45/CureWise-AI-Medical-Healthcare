@@ -187,16 +187,6 @@ During installation:
 
 ---
 
-## 2. Verify Installation
-
-Open **Command Prompt** or **PowerShell**, then run:
-
-```bash
-psql --version
-
-
----
-
 ## Development & Contribution
 
 - Fork and clone the repo.
@@ -224,4 +214,7 @@ This project is licensed under the MIT License.
 ---
 
 **For questions or support, open an issue or contact the maintainer.**
+
+```
+
 ```
