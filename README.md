@@ -166,6 +166,35 @@ createdb curewise
 psql -U tkarim45 -d curewise -h localhost
 ```
 
+## PostgreSQL Setup (Windows)
+
+To set up PostgreSQL for local development on **Windows**, follow these steps:
+
+---
+
+## 1. Install PostgreSQL
+
+Download and install PostgreSQL from the official site:  
+👉 [https://www.postgresql.org/download/windows/](https://www.postgresql.org/download/windows/)
+
+During installation:
+
+- Choose a version (e.g., **16** or **17**)
+- Set a password for the default PostgreSQL user (`postgres`)
+- Leave the port as **5432** (default)
+
+> ✅ After installation, PostgreSQL runs automatically as a Windows service.
+
+---
+
+## 2. Verify Installation
+
+Open **Command Prompt** or **PowerShell**, then run:
+
+```bash
+psql --version
+
+
 ---
 
 ## Development & Contribution
@@ -195,3 +224,4 @@ This project is licensed under the MIT License.
 ---
 
 **For questions or support, open an issue or contact the maintainer.**
+```
