@@ -25,7 +25,6 @@ from utils.agents import *
 import base64
 import numpy as np
 from PIL import Image
-from tensorflow.keras.models import load_model
 import tensorflow as tf
 import gc
 from config.settings import settings

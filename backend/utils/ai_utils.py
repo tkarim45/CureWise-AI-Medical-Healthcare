@@ -14,7 +14,6 @@ from keras.metrics import MeanIoU
 import base64
 import io
 from tensorflow.keras.preprocessing import image as keras_image
-import google.generativeai as genai
 
 kidney_model = None  # Add this line at the top-level
 breast_cancer_model = None
