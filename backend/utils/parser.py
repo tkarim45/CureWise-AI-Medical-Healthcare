@@ -9,6 +9,7 @@ from fastapi import HTTPException
 from datetime import datetime, timedelta
 from collections import defaultdict
 from config.settings import settings
+from groq import Groq
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -288,6 +289,7 @@ async def analyze_acne_image(image_url: str, user_id: str):
     """Analyze an acne-related image using Groq's vision model."""
     try:
         logger.info(f"Analyzing acne image for user {user_id}")
+        client = Groq(api_key=settings.GROQ_API_KEY)
         acne_chat_history = [
             {
                 "role": "system",
