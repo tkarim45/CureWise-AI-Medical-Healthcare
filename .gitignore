@@ -1,6 +1,7 @@
-
+backend/venv
 frontend/node_modules
-
+venv/
+backend/venv/
 backend/.env
 backend/notebooks/.env
 backend/__pycache__
@@ -22,3 +23,5 @@ backend/utils/__pycache__/ai_utils.cpython-39.pyc
 backend/data/eyedisease/eyedisease.h5
 backend/data/Lymphoma/Lymphoma classification1.h5
 backend/data/pneumonia/model-Pneumonia Detection-88.04.h5
+
+
