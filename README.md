@@ -32,9 +32,9 @@ CureWise-AI brings together LLMs, RAG, and healthcare data engineering to provid
 
 ## Key Features
 
-- **LLM-Powered Chatbot:** Natural language interface for patients and doctors, powered by Gemini and Llama models.
+- **LLM-Powered Chatbot:** Natural language interface for patients and doctors, powered by OpenAI (`gpt-4o-mini`).
 - **RAG System:** Combines LLMs with Pinecone vector search for context-rich, accurate answers.
-- **Medical Report Parsing:** Extracts and structures data from blood reports using LlamaParse and Groq.
+- **Medical Report Parsing:** Extracts and structures data from blood reports using LlamaParse and OpenAI (`gpt-4o-mini`).
 - **Appointment Booking Agent:** Intelligent agent for scheduling, rescheduling, and querying appointments.
 - **Acne & Disease Detection:** Image-based analysis using AI models (extendable for other conditions).
 - **Memory & Context:** Maintains chat and report history for personalized, context-aware responses.
@@ -47,7 +47,7 @@ CureWise-AI brings together LLMs, RAG, and healthcare data engineering to provid
 ```
 [React Frontend] <---> [FastAPI Backend: LLM, RAG, AI] <---> [PostgreSQL, Pinecone]
                                               |
-                                [LangChain, Llama, Groq, Gemini]
+                                [LangChain, OpenAI, Groq]
 ```
 
 - **LLM Agents**: Orchestrate workflows, parse documents, and answer queries.
@@ -59,8 +59,8 @@ CureWise-AI brings together LLMs, RAG, and healthcare data engineering to provid
 
 ## Tech Stack
 
-- **LLMs**: Gemini (Google), Llama (Meta), Groq
-- **RAG**: Pinecone, LangChain, Google Generative AI Embeddings
+- **LLMs**: OpenAI (`gpt-4o-mini`); Groq (Llama) for acne vision & disease chat
+- **RAG**: Pinecone, LangChain, OpenAI Embeddings (`text-embedding-3-small`)
 - **Backend**: FastAPI, Python, psycopg2
 - **Frontend**: React
 - **Database**: PostgreSQL
