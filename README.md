@@ -26,7 +26,7 @@ CureWise-AI brings together LLMs, RAG, and healthcare data engineering to provid
 - **Retrieval-Augmented Generation (RAG)** for context-aware, accurate responses using a vector database (Pinecone).
 - **AI-powered analytics** and disease detection. Analyze patient images and provide a diagnosis.
 - **Realtime Agents** connected with database to provide realtime analytics and insights.
-- **Seamless integration** with hospital operations, doctor scheduling, and patient management.
+- **Integrates** with hospital operations, doctor scheduling, and patient management.
 
 ---
 
