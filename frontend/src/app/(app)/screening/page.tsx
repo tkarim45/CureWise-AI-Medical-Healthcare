@@ -65,7 +65,7 @@ export default function ScreeningPage() {
           {error}
         </div>
       ) : models === null ? (
-        <div className="flex items-center gap-2 text-muted">
+        <div className="flex items-center gap-2 text-muted-foreground">
           <Spinner className="size-4" />
           <span className="text-sm">Loading models…</span>
         </div>
@@ -89,9 +89,9 @@ export default function ScreeningPage() {
                       <h2 className="font-serif text-lg font-medium text-ink">
                         {model.label}
                       </h2>
-                      <Icon.ArrowRight className="size-4 text-muted transition-transform duration-200 group-hover:translate-x-1 group-hover:text-primary-strong" />
+                      <Icon.ArrowRight className="size-4 text-muted-foreground transition-transform duration-200 group-hover:translate-x-1 group-hover:text-primary-strong" />
                     </div>
-                    <p className="mt-1 text-sm leading-relaxed text-muted">
+                    <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
                       {sublabel(model)}
                     </p>
                   </div>

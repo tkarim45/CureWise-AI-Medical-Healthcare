@@ -73,11 +73,11 @@ export function FileDrop({
           ) : (
             <>
               <span className="font-medium text-primary-strong">Click to upload</span>
-              <span className="text-muted"> or drag & drop</span>
+              <span className="text-muted-foreground"> or drag & drop</span>
             </>
           )}
         </span>
-        {hint && <span className="text-xs text-muted">{hint}</span>}
+        {hint && <span className="text-xs text-muted-foreground">{hint}</span>}
       </button>
       <input
         ref={inputRef}

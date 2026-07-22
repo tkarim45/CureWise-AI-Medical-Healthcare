@@ -35,7 +35,7 @@ export function AuthAside() {
             );
           })}
         </ul>
-        <p className="mt-12 max-w-sm text-sm text-muted">
+        <p className="mt-12 max-w-sm text-sm text-muted-foreground">
           CureWise informs; it does not diagnose. Always confirm findings with a
           qualified healthcare professional.
         </p>

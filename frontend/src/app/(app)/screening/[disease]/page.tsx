@@ -106,7 +106,7 @@ export default function ScreeningDiseasePage() {
   if (loadingModel) {
     return (
       <PageShell>
-        <div className="flex items-center gap-2 text-muted">
+        <div className="flex items-center gap-2 text-muted-foreground">
           <Spinner className="size-4" />
           <span className="text-sm">Loading…</span>
         </div>
@@ -122,7 +122,7 @@ export default function ScreeningDiseasePage() {
         </div>
         <Link
           href="/screening"
-          className="mt-6 inline-block text-sm text-muted transition-colors hover:text-ink"
+          className="mt-6 inline-block text-sm text-muted-foreground transition-colors hover:text-ink"
         >
           ← All models
         </Link>
@@ -134,11 +134,11 @@ export default function ScreeningDiseasePage() {
     return (
       <PageShell>
         <div className="rounded-[var(--r-lg)] border border-border bg-surface p-8 text-center">
-          <span className="mx-auto grid size-12 place-items-center rounded-[var(--r-md)] bg-surface-2 text-muted">
+          <span className="mx-auto grid size-12 place-items-center rounded-[var(--r-md)] bg-surface-2 text-muted-foreground">
             <Icon.Scan className="size-6" />
           </span>
           <h2 className="mt-4 font-serif text-xl font-medium text-ink">Model not found</h2>
-          <p className="mt-2 text-sm text-muted">
+          <p className="mt-2 text-sm text-muted-foreground">
             We couldn&apos;t find a screening model for &ldquo;{disease}&rdquo;.
           </p>
           <Link
@@ -158,7 +158,7 @@ export default function ScreeningDiseasePage() {
     <PageShell>
       <Link
         href="/screening"
-        className="mb-4 inline-block text-sm text-muted transition-colors hover:text-ink"
+        className="mb-4 inline-block text-sm text-muted-foreground transition-colors hover:text-ink"
       >
         ← All models
       </Link>
@@ -199,7 +199,7 @@ export default function ScreeningDiseasePage() {
             {isSegmentation ? (
               <div className="space-y-4">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-sm text-muted">Predicted class</span>
+                  <span className="text-sm text-muted-foreground">Predicted class</span>
                   <Badge tone={isHealthy(result.predicted_class) ? "success" : "warning"}>
                     {result.predicted_class}
                   </Badge>
@@ -217,7 +217,7 @@ export default function ScreeningDiseasePage() {
                           alt={SEGMENT_CAPTIONS[i] ?? `View ${i + 1}`}
                           className="w-full object-contain"
                         />
-                        <figcaption className="border-t border-border px-3 py-2 text-xs text-muted">
+                        <figcaption className="border-t border-border px-3 py-2 text-xs text-muted-foreground">
                           {SEGMENT_CAPTIONS[i] ?? `View ${i + 1}`}
                         </figcaption>
                       </figure>
@@ -239,7 +239,7 @@ export default function ScreeningDiseasePage() {
                 {typeof result.confidence === "number" && (
                   <div className="mt-4">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted">Confidence</span>
+                      <span className="text-muted-foreground">Confidence</span>
                       <span className="font-mono tabular-nums text-ink">
                         {result.confidence.toFixed(1)}%
                       </span>
@@ -266,7 +266,7 @@ export default function ScreeningDiseasePage() {
             <h3 className="font-serif text-lg font-medium text-ink">
               Ask about {model.label}
             </h3>
-            <p className="mt-1 text-sm text-muted">
+            <p className="mt-1 text-sm text-muted-foreground">
               Questions about this condition, what the result means, or next steps.
             </p>
 
@@ -290,7 +290,7 @@ export default function ScreeningDiseasePage() {
             )}
 
             {chatBusy && (
-              <div className="mt-4 flex items-center gap-2 text-muted">
+              <div className="mt-4 flex items-center gap-2 text-muted-foreground">
                 <Spinner className="size-4" />
                 <span className="text-sm">Thinking…</span>
               </div>
@@ -305,7 +305,7 @@ export default function ScreeningDiseasePage() {
               }}
               className="mt-4"
             >
-              <div className="flex items-end gap-2 rounded-[var(--r-lg)] border border-border bg-bg p-2 focus-within:border-primary focus-within:ring-2 focus-within:ring-ring/35">
+              <div className="flex items-end gap-2 rounded-[var(--r-lg)] border border-border bg-background p-2 focus-within:border-primary focus-within:ring-2 focus-within:ring-ring/35">
                 <textarea
                   value={chatInput}
                   onChange={(e) => setChatInput(e.target.value)}

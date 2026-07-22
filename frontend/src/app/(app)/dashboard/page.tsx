@@ -15,11 +15,11 @@ export default function DashboardPage() {
   return (
     <PageShell>
       <header className="mb-9">
-        <p className="text-muted">{greeting},</p>
+        <p className="text-muted-foreground">{greeting},</p>
         <h1 className="mt-1 text-[2rem] sm:text-[2.5rem] font-medium">
           {user?.username}
         </h1>
-        <p className="mt-3 measure text-muted">
+        <p className="mt-3 measure text-muted-foreground">
           Pick a tool below. Everything here is designed to help you understand
           your health calmly, then point you toward professional care.
         </p>
@@ -44,9 +44,9 @@ export default function DashboardPage() {
                     <h2 className="font-serif text-lg font-medium text-ink">
                       {tool.label}
                     </h2>
-                    <Icon.ArrowRight className="size-4 text-muted transition-transform duration-200 group-hover:translate-x-1 group-hover:text-primary-strong" />
+                    <Icon.ArrowRight className="size-4 text-muted-foreground transition-transform duration-200 group-hover:translate-x-1 group-hover:text-primary-strong" />
                   </div>
-                  <p className="mt-1 text-sm leading-relaxed text-muted">
+                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
                     {tool.description}
                   </p>
                 </div>
@@ -65,9 +65,9 @@ export default function DashboardPage() {
               href={item.href}
               className="flex items-center gap-3 rounded-[var(--r-md)] border border-border bg-surface px-4 py-3.5 text-sm font-medium text-ink transition-colors hover:bg-surface-2"
             >
-              <IconEl className="size-5 text-muted" />
+              <IconEl className="size-5 text-muted-foreground" />
               {item.label}
-              <Icon.ArrowRight className="ml-auto size-4 text-muted" />
+              <Icon.ArrowRight className="ml-auto size-4 text-muted-foreground" />
             </Link>
           );
         })}

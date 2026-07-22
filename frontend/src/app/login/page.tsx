@@ -48,7 +48,7 @@ export default function LoginPage() {
 
         <div className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center py-12">
           <h1 className="text-[2rem] font-medium">Welcome back</h1>
-          <p className="mt-2 text-muted">Sign in to your CureWise account.</p>
+          <p className="mt-2 text-muted-foreground">Sign in to your CureWise account.</p>
 
           <form onSubmit={onSubmit} className="mt-8 flex flex-col gap-4" noValidate>
             <TextField
@@ -77,7 +77,7 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          <p className="mt-6 text-sm text-muted">
+          <p className="mt-6 text-sm text-muted-foreground">
             New here?{" "}
             <Link href="/signup" className="font-medium text-primary-strong hover:underline">
               Create an account

@@ -71,10 +71,10 @@ export default function EmergencyPage() {
           Find hospitals near me
         </Button>
         {phase === "locating" && (
-          <span className="text-sm text-muted">Getting your location…</span>
+          <span className="text-sm text-muted-foreground">Getting your location…</span>
         )}
         {phase === "loading" && (
-          <span className="text-sm text-muted">Finding hospitals nearby…</span>
+          <span className="text-sm text-muted-foreground">Finding hospitals nearby…</span>
         )}
       </div>
 
@@ -85,7 +85,7 @@ export default function EmergencyPage() {
       )}
 
       {busy && (
-        <div className="mt-8 flex items-center gap-2 text-muted">
+        <div className="mt-8 flex items-center gap-2 text-muted-foreground">
           <Spinner className="size-4" />
           <span className="text-sm">
             {phase === "locating" ? "Locating you…" : "Searching for care nearby…"}
@@ -98,7 +98,7 @@ export default function EmergencyPage() {
           <h2 className="font-serif text-lg font-medium text-ink">
             Ready when you are
           </h2>
-          <p className="mt-2 measure text-muted">
+          <p className="mt-2 measure text-muted-foreground">
             Tap the button above to share your location and see hospitals close to
             you. We only use your location for this search — it isn't stored.
           </p>
@@ -110,7 +110,7 @@ export default function EmergencyPage() {
           <h2 className="font-serif text-lg font-medium text-ink">
             No hospitals found nearby
           </h2>
-          <p className="mt-2 measure text-muted">
+          <p className="mt-2 measure text-muted-foreground">
             We couldn't find any hospitals close to your location. If this is an
             emergency, call your local emergency number right away.
           </p>
@@ -133,7 +133,7 @@ export default function EmergencyPage() {
                     <h2 className="font-serif text-lg font-medium text-ink">
                       {h.name}
                     </h2>
-                    <p className="mt-1 text-sm leading-relaxed text-muted">
+                    <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
                       {h.address}
                     </p>
                   </div>

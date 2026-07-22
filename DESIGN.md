@@ -58,10 +58,17 @@ Brand anchor: blue, hue ~258°.
 
 ## Components
 
-- **Button**: primary (teal fill), secondary (bordered), ghost, danger. 44px min
-  target. Visible focus ring, subtle press.
-- **Field**: label + input + hint/error, error in danger color at AA.
-- **Card / Panel**: bordered `--surface`, no nested cards, no side-stripe borders.
+Built on **shadcn/ui** (radix primitives, Lucide icons) re-skinned to the
+CureWise tokens above. The palette lives in shadcn's token names
+(`--primary`, `--card`, `--muted-foreground`, `--border`, `--ring`, …) plus a
+few CureWise extras (`--primary-strong`, `--primary-soft`, `--surface-2`,
+`--success/--warning/--danger` + `-soft`). Premium blue, primary hue ~262.
+
+- **Button**: primary (blue fill), secondary (bordered), ghost, danger. 44px min
+  target (h-11 default). Visible focus ring, subtle press.
+- **Field**: shadcn Input/Textarea/Label + label/hint/error, error at AA.
+- **Card / Panel**: bordered `--card`, no nested cards, no side-stripe borders.
+- **App chrome**: shadcn Sheet (mobile drawer), Avatar, Separator.
 - **Tool tile** (dashboard): icon + name + one-line purpose; whole tile is the link.
 - **Result badge**: Normal / Watch / Urgent, semantic color + text, never color alone.
 - **Disclaimer**: a persistent, quiet inline note on every AI result ("informs, not

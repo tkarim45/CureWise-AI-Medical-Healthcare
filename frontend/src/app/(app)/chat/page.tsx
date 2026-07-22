@@ -48,7 +48,7 @@ export default function ChatPage() {
     <div className="flex h-[calc(100dvh-3.5rem)] flex-col md:h-dvh">
       <div className="border-b border-border px-5 py-4 sm:px-8">
         <h1 className="text-xl font-medium">Health assistant</h1>
-        <p className="text-sm text-muted">
+        <p className="text-sm text-muted-foreground">
           Grounded in a curated medical knowledge base.
         </p>
       </div>
@@ -63,7 +63,7 @@ export default function ChatPage() {
               <h2 className="mt-4 font-serif text-2xl font-medium">
                 What would you like to understand?
               </h2>
-              <p className="mt-2 text-muted measure">
+              <p className="mt-2 text-muted-foreground measure">
                 Ask about symptoms, conditions or test results. Answers are plain
                 and calm, and they always point you to professional care.
               </p>
@@ -102,7 +102,7 @@ export default function ChatPage() {
                 </div>
               ))}
               {busy && (
-                <div className="flex items-center gap-2 text-muted">
+                <div className="flex items-center gap-2 text-muted-foreground">
                   <Spinner className="size-4" />
                   <span className="text-sm">Thinking…</span>
                 </div>
@@ -122,7 +122,7 @@ export default function ChatPage() {
           className="mx-auto w-full max-w-3xl"
         >
           {error && <p className="mb-2 text-sm text-danger">{error}</p>}
-          <div className="flex items-end gap-2 rounded-[var(--r-lg)] border border-border bg-bg p-2 focus-within:border-primary focus-within:ring-2 focus-within:ring-ring/35">
+          <div className="flex items-end gap-2 rounded-[var(--r-lg)] border border-border bg-background p-2 focus-within:border-primary focus-within:ring-2 focus-within:ring-ring/35">
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -145,7 +145,7 @@ export default function ChatPage() {
               <Icon.Send className="size-5" />
             </button>
           </div>
-          <p className="mt-2 text-center text-xs text-muted">
+          <p className="mt-2 text-center text-xs text-muted-foreground">
             CureWise can be wrong. It informs, and does not diagnose.
           </p>
         </form>

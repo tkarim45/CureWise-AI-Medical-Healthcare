@@ -14,7 +14,7 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-dvh">
-      <header className="sticky top-0 z-30 border-b border-border bg-bg/85 backdrop-blur">
+      <header className="sticky top-0 z-30 border-b border-border bg-background/85 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 sm:px-8">
           <Logo />
           <div className="flex items-center gap-2">
@@ -66,7 +66,7 @@ export default function LandingPage() {
             <h1 className="mt-5 max-w-3xl font-serif text-[2.6rem] font-medium leading-[1.08] sm:text-[3.4rem]">
               Understand what your health is telling you.
             </h1>
-            <p className="mt-5 max-w-xl text-lg text-muted">
+            <p className="mt-5 max-w-xl text-lg text-muted-foreground">
               Upload a blood report and read it in plain words. Screen a photo
               across seven trained models. Ask a grounded assistant. CureWise
               helps you understand, then points you to professional care.
@@ -88,7 +88,7 @@ export default function LandingPage() {
                 </Link>
               )}
             </div>
-            <p className="mt-6 flex items-center gap-2 text-sm text-muted">
+            <p className="mt-6 flex items-center gap-2 text-sm text-muted-foreground">
               <Icon.Info className="size-4" />
               Informs, does not diagnose. Always confirm with a clinician.
             </p>
@@ -115,7 +115,7 @@ export default function LandingPage() {
                     <h3 className="font-serif text-xl font-medium text-ink">
                       {tool.label}
                     </h3>
-                    <p className="col-start-2 text-muted sm:col-start-3">
+                    <p className="col-start-2 text-muted-foreground sm:col-start-3">
                       {tool.description}
                     </p>
                   </div>
@@ -135,7 +135,7 @@ export default function LandingPage() {
             ].map((item) => (
               <div key={item.k}>
                 <h3 className="font-serif text-xl font-medium text-ink">{item.k}</h3>
-                <p className="mt-2 text-muted">{item.v}</p>
+                <p className="mt-2 text-muted-foreground">{item.v}</p>
               </div>
             ))}
           </div>
@@ -161,7 +161,7 @@ export default function LandingPage() {
       </main>
 
       <footer className="border-t border-border">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-5 py-8 text-sm text-muted sm:flex-row sm:px-8">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-5 py-8 text-sm text-muted-foreground sm:flex-row sm:px-8">
           <Logo />
           <p>CureWise informs, and does not diagnose. © {new Date().getFullYear()}</p>
         </div>

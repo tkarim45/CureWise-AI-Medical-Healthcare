@@ -10,7 +10,7 @@ import { api, ApiError, type Profile } from "@/lib/api";
 const GENDERS = ["Female", "Male", "Non-binary", "Prefer not to say"];
 
 const selectClass =
-  "h-11 w-full rounded-[var(--r-md)] border border-border bg-bg px-3.5 text-ink " +
+  "h-11 w-full rounded-[var(--r-md)] border border-border bg-background px-3.5 text-ink " +
   "transition-[box-shadow,border-color] duration-150 " +
   "focus:outline-none focus:border-primary focus:ring-2 focus:ring-ring/35 disabled:opacity-60";
 
@@ -122,7 +122,7 @@ export default function ProfilePage() {
       <PageHeader title="Profile" lead="Your account details." />
 
       {loading ? (
-        <div className="flex items-center gap-2 text-muted">
+        <div className="flex items-center gap-2 text-muted-foreground">
           <Spinner className="size-4" />
           <span className="text-sm">Loading your profile…</span>
         </div>
@@ -141,7 +141,7 @@ export default function ProfilePage() {
                 <p className="font-serif text-lg font-medium text-ink">
                   {profile.username}
                 </p>
-                <p className="truncate text-sm text-muted">{profile.email}</p>
+                <p className="truncate text-sm text-muted-foreground">{profile.email}</p>
               </div>
             </div>
 

@@ -11,7 +11,7 @@ export function PageHeader({
     <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
       <div className="max-w-2xl">
         <h1 className="text-[1.9rem] sm:text-[2.25rem] font-medium">{title}</h1>
-        {lead && <p className="mt-2 text-muted measure">{lead}</p>}
+        {lead && <p className="mt-2 text-muted-foreground measure">{lead}</p>}
       </div>
       {children}
     </div>

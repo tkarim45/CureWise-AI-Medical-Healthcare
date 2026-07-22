@@ -97,7 +97,7 @@ export default function HistoryPage() {
 
       <div className="rounded-[var(--r-lg)] border border-border bg-surface p-5 sm:p-6">
         <h2 className="font-serif text-lg font-medium text-ink">Add an entry</h2>
-        <p className="mt-1 text-sm text-muted">
+        <p className="mt-1 text-sm text-muted-foreground">
           Fill in what's relevant — at least one field is enough to save.
         </p>
         <form onSubmit={save} className="mt-5 flex flex-col gap-4">
@@ -141,7 +141,7 @@ export default function HistoryPage() {
         <h2 className="text-lg font-medium text-ink">Your entries</h2>
 
         {loading ? (
-          <div className="mt-6 flex items-center gap-2 text-muted">
+          <div className="mt-6 flex items-center gap-2 text-muted-foreground">
             <Spinner className="size-4" />
             <span className="text-sm">Loading your history…</span>
           </div>
@@ -151,7 +151,7 @@ export default function HistoryPage() {
           </div>
         ) : entries.length === 0 ? (
           <div className="mt-6 rounded-[var(--r-lg)] border border-border bg-surface-2/60 p-6 sm:p-8">
-            <p className="measure text-muted">
+            <p className="measure text-muted-foreground">
               You haven't added anything yet. Use the form above to record your
               conditions, allergies and notes — they'll appear here.
             </p>
@@ -169,7 +169,7 @@ export default function HistoryPage() {
                   <div className="flex flex-col gap-4">
                     {entry.conditions && (
                       <div>
-                        <p className="text-xs font-medium uppercase tracking-wide text-muted">
+                        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                           Conditions
                         </p>
                         <p className="mt-1 whitespace-pre-wrap leading-relaxed text-ink">
@@ -179,7 +179,7 @@ export default function HistoryPage() {
                     )}
                     {entry.allergies && (
                       <div>
-                        <p className="text-xs font-medium uppercase tracking-wide text-muted">
+                        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                           Allergies
                         </p>
                         <p className="mt-1 whitespace-pre-wrap leading-relaxed text-ink">
@@ -189,7 +189,7 @@ export default function HistoryPage() {
                     )}
                     {entry.notes && (
                       <div>
-                        <p className="text-xs font-medium uppercase tracking-wide text-muted">
+                        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                           Notes
                         </p>
                         <p className="mt-1 whitespace-pre-wrap leading-relaxed text-ink">
@@ -199,7 +199,7 @@ export default function HistoryPage() {
                     )}
                   </div>
                   {date && (
-                    <p className="mt-4 border-t border-border pt-3 text-xs text-muted">
+                    <p className="mt-4 border-t border-border pt-3 text-xs text-muted-foreground">
                       Updated {date}
                     </p>
                   )}

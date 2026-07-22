@@ -92,7 +92,7 @@ export default function ReportPage() {
             Explain my report
           </Button>
           {!file && !question.trim() && (
-            <span className="text-sm text-muted">
+            <span className="text-sm text-muted-foreground">
               Upload a PDF or ask a question to begin.
             </span>
           )}
@@ -118,7 +118,7 @@ export default function ReportPage() {
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[36rem] border-collapse text-sm">
                   <thead>
-                    <tr className="border-b border-border text-left text-muted">
+                    <tr className="border-b border-border text-left text-muted-foreground">
                       <th className="py-2 pr-4 font-medium">Test</th>
                       <th className="py-2 pr-4 font-medium">Value</th>
                       <th className="py-2 pr-4 font-medium">Unit</th>
@@ -135,8 +135,8 @@ export default function ReportPage() {
                           <td className="py-2.5 pr-4 font-mono tabular text-ink">
                             {row.patient_value}
                           </td>
-                          <td className="py-2.5 pr-4 text-muted">{row.unit || "—"}</td>
-                          <td className="py-2.5 pr-4 font-mono tabular text-muted">
+                          <td className="py-2.5 pr-4 text-muted-foreground">{row.unit || "—"}</td>
+                          <td className="py-2.5 pr-4 font-mono tabular text-muted-foreground">
                             {row.reference_value || "—"}
                           </td>
                           <td className="py-2.5">

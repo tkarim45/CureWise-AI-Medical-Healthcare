@@ -53,7 +53,7 @@ export default function SignupPage() {
 
         <div className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center py-12">
           <h1 className="text-[2rem] font-medium">Create your account</h1>
-          <p className="mt-2 text-muted">Free to start. One account, every tool.</p>
+          <p className="mt-2 text-muted-foreground">Free to start. One account, every tool.</p>
 
           <form onSubmit={onSubmit} className="mt-8 flex flex-col gap-4" noValidate>
             <TextField
@@ -91,7 +91,7 @@ export default function SignupPage() {
             </Button>
           </form>
 
-          <p className="mt-6 text-sm text-muted">
+          <p className="mt-6 text-sm text-muted-foreground">
             Already have an account?{" "}
             <Link href="/login" className="font-medium text-primary-strong hover:underline">
               Sign in
