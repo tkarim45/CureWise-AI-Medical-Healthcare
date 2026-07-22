@@ -1,27 +1,46 @@
-backend/venv
-frontend/node_modules
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# --- Virtual envs ---
 venv/
+.venv/
 backend/venv/
+env/
+
+# --- Secrets / env files ---
+.env
 backend/.env
 backend/notebooks/.env
-backend/__pycache__
-backend/models/__pycache__
-backend/routes/__pycache__
-Screenshot 2025-05-15 at 4.25.44 PM.png
-
 backend/utils/.env
+*.local
 
-backend/models/.DS_Store
+# --- Node / Next.js ---
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/.vercel/
+node_modules/
 
+# --- OS / editor cruft ---
 .DS_Store
-frontend/.DS_Store
+*.swp
+Screenshot 2025-05-15 at 4.25.44 PM.png
 
+# --- Runtime ---
+backend/uploads/
 
-backend/data/Breast Cancer/Model
-backend/data/kidney_disease/Model
-backend/utils/__pycache__/ai_utils.cpython-39.pyc
+# --- ML model weights (large; provisioned out-of-band, not committed) ---
+backend/data/Breast Cancer/Model/
+backend/data/kidney_disease/Model/
 backend/data/eyedisease/eyedisease.h5
 backend/data/Lymphoma/Lymphoma classification1.h5
 backend/data/pneumonia/model-Pneumonia Detection-88.04.h5
+backend/data/bloodcell/
 
-
+# --- Patient data (never commit; contains PII) ---
+backend/data/blood_reports/

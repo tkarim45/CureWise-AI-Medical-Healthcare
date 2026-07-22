@@ -1,220 +1,130 @@
-# CureWise-AI: AI-Powered Healthcare Platform
+# CureWise
 
-**CureWise-AI** is a modern, production-grade healthcare data platform that leverages Large Language Models (LLMs), Retrieval-Augmented Generation (RAG), and advanced AI/ML techniques to deliver intelligent analytics, medical report parsing, and conversational AI for hospitals, doctors, and patients.
+CureWise is a personal AI health companion. One account gives a user a set of
+self-serve tools that help them understand their health calmly, then point them
+toward professional care. It informs; it does not diagnose.
 
----
-
-## Table of Contents
-
-- [Project Overview](#project-overview)
-- [Key Features](#key-features)
-- [Architecture](#architecture)
-- [Tech Stack](#tech-stack)
-- [Directory Structure](#directory-structure)
-- [Setup & Installation](#setup--installation)
-- [Development & Contribution](#development--contribution)
-- [License](#license)
+There are no hospital, doctor, admin, or appointment features. Every account is a
+single `user` role.
 
 ---
 
-## Project Overview
+## What it does
 
-CureWise-AI brings together LLMs, RAG, and healthcare data engineering to provide:
+- **Health assistant** — a chatbot grounded in a curated medical knowledge base
+  (RAG over Pinecone), with plain-language answers.
+- **Blood report reader** — upload a lab PDF, get it parsed (LlamaParse) and
+  explained in plain words, with a structured results table.
+- **Image screening** — screen a medical image across seven trained models:
+  kidney (CT), lymphoma, pneumonia, eye disease, breast-cancer imaging
+  (segmentation), blood-cell type, and AML genetic markers.
+- **Skin & acne check** — a first read on a skin photo using a vision model.
+- **Per-condition chat** — a specialist assistant for each disease area.
+- **Nearby care** — find hospitals near the user's location (OpenStreetMap
+  Overpass), for emergencies.
 
-- **Conversational AI** for medical queries, appointment booking, and patient support.
-- **Automated parsing and structuring** of medical documents (e.g., blood reports) using LLMs.
-- **Retrieval-Augmented Generation (RAG)** for context-aware, accurate responses using a vector database (Pinecone).
-- **AI-powered analytics** and disease detection. Analyze patient images and provide a diagnosis.
-- **Realtime Agents** connected with database to provide realtime analytics and insights.
-- **Integrates** with hospital operations, doctor scheduling, and patient management.
-
----
-
-## Key Features
-
-- **LLM-Powered Chatbot:** Natural language interface for patients and doctors, powered by OpenAI (`gpt-4o-mini`).
-- **RAG System:** Combines LLMs with Pinecone vector search for context-rich, accurate answers.
-- **Medical Report Parsing:** Extracts and structures data from blood reports using LlamaParse and OpenAI (`gpt-4o-mini`).
-- **Appointment Booking Agent:** Intelligent agent for scheduling, rescheduling, and querying appointments.
-- **Acne & Disease Detection:** Image-based analysis using AI models (extendable for other conditions).
-- **Memory & Context:** Maintains chat and report history for personalized, context-aware responses.
-- **Extensible Tools:** Modular agent design for adding new tools and workflows.
+Every AI result carries a persistent disclaimer: CureWise informs, and does not
+diagnose.
 
 ---
 
-## Architecture
+## Tech stack
+
+**Backend** — FastAPI, PostgreSQL (raw SQL over a pooled connection), JWT auth
+(python-jose + passlib/bcrypt). LLMs: OpenAI `gpt-4o-mini` (chat, embeddings,
+report structuring), Groq `llama-3.3-70b` / `llama-4-scout` (per-disease chat,
+skin vision). RAG on Pinecone (`text-embedding-3-small`, 1536-dim). Blood-report
+parsing via LlamaParse. Image models are Keras/TensorFlow `.h5` files loaded
+lazily and cached.
+
+**Frontend** — Next.js 16 (App Router), React 19, TypeScript, Tailwind v4. Light
+and dark themes, calm clinical design, WCAG 2.2 AA. See `DESIGN.md` and
+`PRODUCT.md`.
+
+---
+
+## Backend architecture
+
+Feature-first layout under `backend/src`:
 
 ```
-[React Frontend] <---> [FastAPI Backend: LLM, RAG, AI] <---> [PostgreSQL, Pinecone]
-                                              |
-                                [LangChain, OpenAI, Groq]
+backend/src/
+  main.py                 # app factory, router mounting, lifespan
+  core/                   # config, pooled database, security (JWT), deps, logging
+  db/schema.py            # users, medical_history, general_chat_history
+  auth/                   # signup / login / me
+  features/
+    profile/              # each feature: router.py, service.py, schemas.py
+    medical_history/
+    chat/                 #   RAG chatbot (rag.py)
+    medical_report/       #   LlamaParse + structuring (parser.py)
+    skin/                 #   acne vision
+    emergency/            #   nearby hospitals
+    disease_detection/    #   registry of 7 models (specs.py, registry.py)
 ```
 
-- **LLM Agents**: Orchestrate workflows, parse documents, and answer queries.
-- **RAG**: Uses Pinecone for vector search over medical conversations and documents.
-- **FastAPI**: Exposes REST APIs for all LLM and AI features.
-- **PostgreSQL**: Stores chat, report, and appointment history.
+Adding a new image model is a data change in
+`features/disease_detection/specs.py` (key, weights path, input size, labels,
+optional chat prompt), not new endpoint code. The routes are:
+
+```
+GET  /api/disease-detection                      # list models
+POST /api/disease-detection/{disease}/classify   # image -> prediction
+POST /api/disease-detection/{disease}/chat        # specialist Q&A
+```
+
+Model weights are large (~1.2 GB total) and are not committed; they live under
+`backend/data/` and are gitignored. Provision them out of band.
 
 ---
 
-## Tech Stack
+## Setup
 
-- **LLMs**: OpenAI (`gpt-4o-mini`); Groq (Llama) for acne vision & disease chat
-- **RAG**: Pinecone, LangChain, OpenAI Embeddings (`text-embedding-3-small`)
-- **Backend**: FastAPI, Python, psycopg2
-- **Frontend**: React
-- **Database**: PostgreSQL
-- **AI/ML**: LlamaParse, custom disease detection models
-- **Containerization**: Docker
-
----
-
-## Directory Structure
-
-```
-backend/
-│
-├── main.py                 # FastAPI app, API endpoints
-├── utils/
-│   ├── agents.py           # LLM agent orchestration, tools, booking agent
-│   ├── pineconeutils.py    # RAG, Pinecone vector DB, retrieval chains
-│   ├── parser.py           # LlamaParse, Groq, report parsing/structuring
-│   ├── email.py            # Email utilities
-│   └── ...                 # Other utilities
-├── models/
-│   └── schemas.py          # Pydantic schemas
-├── config/
-│   └── settings.py         # API keys, DB config
-├── notebooks/
-│   ├── RAG_Chatbot_Pinecone.ipynb
-│   ├── LlamaParser.ipynb
-│   └── ...                 # Demos and experiments
-└── requirements.txt        # Python dependencies
-```
-
----
-
-## Setup & Installation
-
-### Prerequisites
-
-- Python 3.9+
-- PostgreSQL
-- Pinecone account (API key)
-- Google Generative AI API key
-- Groq API key
-- LlamaParse API key
-
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/tkarim45/CureWise-AI-Medical-Healthcare.git
-cd CureWise-AI-Medical-Healthcare
-```
-
-### 2. Docker Setup
-
-```bash
-docker compose up --build
-```
-
-### 3. Local Setup
-
-#### 1. Create a virtual environment
+### Backend
 
 ```bash
 cd backend
-python -m venv venv
-source venv/bin/activate
+cp .env.example .env          # fill in API keys + DB settings
+python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
+uvicorn src.main:app --reload --port 8000
 ```
 
-#### 2. Configure Environment
+Requires a running PostgreSQL. The schema is created automatically on startup.
 
-- Set API keys and DB credentials in `config/settings.py` or as environment variables:
-  - `GOOGLE_API_KEY`
-  - `PINECONE_API_KEY`
-  - `GROQ_API_KEY`
-  - `LLAMA_PARSER_API_KEY`
-  - `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT`
-
-#### 3. Run the Backend
-
-```bash
-uvicorn main:app --reload
-```
-
-#### 4. Run the Frontend
+### Frontend
 
 ```bash
 cd frontend
+cp .env.example .env.local    # NEXT_PUBLIC_API_URL, defaults to localhost:8000
 npm install
-npm start
+npm run dev                   # http://localhost:3000
 ```
 
----
+### Docker
 
-## PostgreSQL Setup (macOS)
-
-To set up PostgreSQL for local development, run the following commands:
-
-```sh
-brew install postgresql
-brew services start postgresql
-psql -l
-createdb curewise
-psql -U tkarim45 -d curewise -h localhost
+```bash
+docker compose up --build     # postgres + backend (8000) + frontend (3000)
 ```
 
-## PostgreSQL Setup (Windows)
-
-To set up PostgreSQL for local development on **Windows**, follow these steps:
+Model weights are mounted from `./backend/data` into the backend container.
 
 ---
 
-## 1. Install PostgreSQL
+## Directory structure
 
-Download and install PostgreSQL from the official site:  
-👉 [https://www.postgresql.org/download/windows/](https://www.postgresql.org/download/windows/)
-
-During installation:
-
-- Choose a version (e.g., **16** or **17**)
-- Set a password for the default PostgreSQL user (`postgres`)
-- Leave the port as **5432** (default)
-
-> ✅ After installation, PostgreSQL runs automatically as a Windows service.
-
----
-
-## Development & Contribution
-
-- Fork and clone the repo.
-- Use feature branches and submit PRs.
-- Follow best practices for Python, LLM prompt engineering, and API design.
-- Add tests and update documentation for new features.
+```
+CureWise-AI-Medical-Healthcare/
+├── backend/          # FastAPI app (src/ feature layout), model weights in data/
+├── frontend/         # Next.js 16 app
+├── docker-compose.yml
+├── PRODUCT.md        # strategic product brief
+├── DESIGN.md         # visual system (tokens, type, components)
+└── README.md
+```
 
 ---
 
 ## License
 
-This project is licensed under the MIT License.
-
----
-
-## Acknowledgements
-
-- [LangChain](https://python.langchain.com/)
-- [Pinecone](https://www.pinecone.io/)
-- [Google Generative AI](https://ai.google.dev/)
-- [Groq](https://groq.com/)
-- [LlamaParse](https://llamaindex.ai/)
-- [FastAPI](https://fastapi.tiangolo.com/)
-
----
-
-**For questions or support, open an issue or contact the maintainer.**
-
-```
-
-```
+See repository license.
