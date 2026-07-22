@@ -19,12 +19,12 @@ export const metadata: Metadata = {
 };
 
 // Set the theme before first paint to avoid a flash of the wrong theme.
+// Default is light; users can switch to dark and the choice is remembered.
 const themeScript = `
 (function () {
   try {
     var stored = localStorage.getItem('curewise-theme');
-    var system = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    var theme = stored === 'light' || stored === 'dark' ? stored : system;
+    var theme = stored === 'dark' ? 'dark' : 'light';
     if (theme === 'dark') document.documentElement.classList.add('dark');
   } catch (e) {}
 })();
