@@ -10,7 +10,7 @@ function renderInline(text: string, keyBase: string) {
   const parts = text.split(/(\*\*[^*]+\*\*)/g).filter(Boolean);
   return parts.map((part, i) =>
     part.startsWith("**") && part.endsWith("**") ? (
-      <strong key={`${keyBase}-${i}`} className="font-semibold text-ink">
+      <strong key={`${keyBase}-${i}`} className="font-semibold text-primary-strong">
         {part.slice(2, -2)}
       </strong>
     ) : (

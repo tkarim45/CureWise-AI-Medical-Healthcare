@@ -4,121 +4,135 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* ------------------------------------------------------------------ */
-/*  CureWise — premium white & blue. shadcn tokens carry the palette;   */
-/*  a few semantic extras (success/warning/danger, surface levels) sit   */
-/*  alongside. Light is default; dark is a first-class alternate.        */
-/*  Both meet WCAG 2.2 AA. See DESIGN.md.                                */
-/* ------------------------------------------------------------------ */
+/* ==================================================================
+   CureWise global theme — Bryge design system, medical adaptation.
+   ONE file drives every page: change a token or class here and it
+   applies everywhere. Two fonts (Archivo + Azeret Mono), one accent,
+   neutral scale, light base with class-scoped dark. See DESIGN.md.
+   ================================================================== */
 
 :root {
-  /* shadcn core */
-  --background: oklch(0.986 0.006 255);
-  --foreground: oklch(0.22 0.03 264);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.22 0.03 264);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.22 0.03 264);
-  --primary: oklch(0.52 0.19 262);
-  --primary-foreground: oklch(0.99 0.005 255);
-  --secondary: oklch(0.955 0.01 255);
-  --secondary-foreground: oklch(0.3 0.05 264);
-  --muted: oklch(0.965 0.008 255);
-  --muted-foreground: oklch(0.48 0.03 262);
-  --accent: oklch(0.95 0.025 258);
-  --accent-foreground: oklch(0.43 0.16 262);
-  --destructive: oklch(0.55 0.2 27);
-  --border: oklch(0.913 0.011 255);
-  --input: oklch(0.9 0.013 255);
-  --ring: oklch(0.52 0.19 262);
+  /* --- Bryge neutral scale + accent (light) --- */
+  --background: #ffffff;      /* page background            (lp-bg)     */
+  --foreground: #111114;      /* primary text               (lp-text)   */
+  --card: #ffffff;
+  --card-foreground: #111114;
+  --popover: #ffffff;
+  --popover-foreground: #111114;
+  --primary: #2174e8;         /* THE brand accent           (lp-accent) */
+  --primary-foreground: #ffffff;
+  --secondary: #f5f7fa;       /* raised surfaces            (lp-raise)  */
+  --secondary-foreground: #111114;
+  --muted: #f5f7fa;
+  --muted-foreground: #5a6472; /* secondary text            (lp-dim)    */
+  --accent: rgba(33, 116, 232, 0.1);
+  --accent-foreground: #111114;
+  --destructive: #dc2626;
+  --border: #e2e6ec;
+  --input: #e2e6ec;
+  --ring: #2174e8;
 
-  /* semantic extras (CureWise) */
-  --primary-strong: oklch(0.45 0.19 264);
-  --primary-soft: oklch(0.955 0.032 258);
-  --on-primary: oklch(0.99 0.005 255);
-  --surface: oklch(1 0 0);
-  --surface-2: oklch(0.955 0.011 255);
-  --ink: oklch(0.22 0.03 264);
-  --success: oklch(0.52 0.13 155);
-  --success-soft: oklch(0.95 0.04 155);
-  --warning: oklch(0.55 0.12 66);
-  --warning-soft: oklch(0.95 0.05 80);
-  --danger: oklch(0.55 0.2 27);
-  --danger-soft: oklch(0.95 0.035 25);
+  /* --- CureWise extras --- */
+  --border-soft: #eef1f5;     /* hairlines, grid gaps       (lp-border-soft) */
+  --faint: #8b94a2;           /* tertiary text, metadata    (lp-faint)  */
+  --primary-strong: color-mix(in oklab, #2174e8 86%, #000);
+  --primary-soft: rgba(33, 116, 232, 0.12);
+  --on-primary: #ffffff;
+  --surface: #ffffff;
+  --surface-2: #f5f7fa;
+  --ink: #111114;
+  --success: #0f7b5f;
+  --success-soft: rgba(16, 150, 114, 0.12);
+  --warning: #b45309;
+  --warning-soft: rgba(245, 158, 11, 0.14);
+  --danger: #b91c1c;
+  --danger-soft: rgba(220, 38, 38, 0.1);
 
-  --shadow-sm: 0 1px 2px oklch(0.4 0.06 264 / 0.08);
-  --shadow-md: 0 10px 30px -12px oklch(0.4 0.08 264 / 0.16);
-  --shadow-lg: 0 28px 56px -20px oklch(0.35 0.09 264 / 0.24);
+  /* Shadows are rare and quiet; elevation comes from borders + bg steps. */
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 2px 6px rgba(15, 23, 42, 0.1);
+  --shadow-lg: 0 8px 24px rgba(15, 23, 42, 0.12);
 
-  --radius: 0.7rem;
+  /* Radii: buttons/inputs 8, cards 12, feature panels 18, pills 999. */
+  --radius: 8px;
   --r-sm: 6px;
-  --r-md: 10px;
-  --r-lg: 16px;
+  --r-md: 8px;
+  --r-lg: 12px;
+  --r-xl: 18px;
   --r-full: 999px;
 
-  --sidebar: oklch(1 0 0);
-  --sidebar-foreground: oklch(0.22 0.03 264);
-  --sidebar-primary: oklch(0.52 0.19 262);
-  --sidebar-primary-foreground: oklch(0.99 0.005 255);
-  --sidebar-accent: oklch(0.955 0.032 258);
-  --sidebar-accent-foreground: oklch(0.43 0.16 262);
-  --sidebar-border: oklch(0.913 0.011 255);
-  --sidebar-ring: oklch(0.52 0.19 262);
+  /* Motion: functional, never decorative. */
+  --dur: 250ms;
+  --dur-slow: 400ms;
+  --ease-enter: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-exit: cubic-bezier(0.55, 0, 1, 0.45);
 
-  --chart-1: oklch(0.52 0.19 262);
-  --chart-2: oklch(0.62 0.15 220);
-  --chart-3: oklch(0.68 0.13 180);
-  --chart-4: oklch(0.6 0.16 300);
-  --chart-5: oklch(0.7 0.15 140);
+  --sidebar: #ffffff;
+  --sidebar-foreground: #111114;
+  --sidebar-primary: #2174e8;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: rgba(33, 116, 232, 0.1);
+  --sidebar-accent-foreground: #111114;
+  --sidebar-border: #e2e6ec;
+  --sidebar-ring: #2174e8;
+
+  --chart-1: #2174e8;
+  --chart-2: #8b5cf6;
+  --chart-3: #0f7b5f;
+  --chart-4: #b45309;
+  --chart-5: #5a6472;
 
   color-scheme: light;
 }
 
 .dark {
-  --background: oklch(0.16 0.02 264);
-  --foreground: oklch(0.96 0.008 255);
-  --card: oklch(0.2 0.022 264);
-  --card-foreground: oklch(0.96 0.008 255);
-  --popover: oklch(0.2 0.022 264);
-  --popover-foreground: oklch(0.96 0.008 255);
-  --primary: oklch(0.64 0.17 262);
-  --primary-foreground: oklch(0.15 0.02 264);
-  --secondary: oklch(0.26 0.025 264);
-  --secondary-foreground: oklch(0.96 0.008 255);
-  --muted: oklch(0.26 0.02 264);
-  --muted-foreground: oklch(0.72 0.02 258);
-  --accent: oklch(0.3 0.05 262);
-  --accent-foreground: oklch(0.88 0.06 258);
-  --destructive: oklch(0.7 0.19 22);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.64 0.17 262);
+  --background: #0a0a0a;
+  --foreground: #f2f2f0;
+  --card: #111113;
+  --card-foreground: #f2f2f0;
+  --popover: #111113;
+  --popover-foreground: #f2f2f0;
+  /* Accent is LIFTED in dark for contrast (#2174E8 fails AA on #0a0a0a). */
+  --primary: #3f8af3;
+  --primary-foreground: #ffffff;
+  --secondary: #1a1a1c;
+  --secondary-foreground: #f2f2f0;
+  --muted: #161618;
+  --muted-foreground: #9c9c9c;
+  --accent: rgba(63, 138, 243, 0.14);
+  --accent-foreground: #f2f2f0;
+  --destructive: #ef4444;
+  --border: #232326;
+  --input: #232326;
+  --ring: #3f8af3;
 
-  --primary-strong: oklch(0.78 0.14 260);
-  --primary-soft: oklch(0.32 0.08 264);
-  --on-primary: oklch(0.15 0.02 264);
-  --surface: oklch(0.2 0.022 264);
-  --surface-2: oklch(0.24 0.024 264);
-  --ink: oklch(0.96 0.008 255);
-  --success: oklch(0.72 0.14 155);
-  --success-soft: oklch(0.3 0.05 155);
-  --warning: oklch(0.8 0.13 80);
-  --warning-soft: oklch(0.32 0.06 80);
-  --danger: oklch(0.7 0.19 22);
-  --danger-soft: oklch(0.32 0.07 25);
+  --border-soft: #1a1a1c;
+  --faint: #5c5c5e;
+  --primary-strong: color-mix(in oklab, #3f8af3 78%, #fff);
+  --primary-soft: rgba(63, 138, 243, 0.14);
+  --on-primary: #ffffff;
+  --surface: #111113;
+  --surface-2: #1a1a1c;
+  --ink: #f2f2f0;
+  --success: #3ecf8e;
+  --success-soft: rgba(62, 207, 142, 0.14);
+  --warning: #fbbf24;
+  --warning-soft: rgba(251, 191, 36, 0.14);
+  --danger: #f87171;
+  --danger-soft: rgba(248, 113, 113, 0.14);
 
-  --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.4);
-  --shadow-md: 0 10px 30px -12px oklch(0 0 0 / 0.5);
-  --shadow-lg: 0 28px 56px -20px oklch(0 0 0 / 0.6);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.55);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.6);
 
-  --sidebar: oklch(0.2 0.022 264);
-  --sidebar-foreground: oklch(0.96 0.008 255);
-  --sidebar-primary: oklch(0.64 0.17 262);
-  --sidebar-primary-foreground: oklch(0.15 0.02 264);
-  --sidebar-accent: oklch(0.3 0.05 262);
-  --sidebar-accent-foreground: oklch(0.88 0.06 258);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.64 0.17 262);
+  --sidebar: #111113;
+  --sidebar-foreground: #f2f2f0;
+  --sidebar-primary: #3f8af3;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: rgba(63, 138, 243, 0.14);
+  --sidebar-accent-foreground: #f2f2f0;
+  --sidebar-border: #232326;
+  --sidebar-ring: #3f8af3;
 
   color-scheme: dark;
 }
@@ -143,7 +157,8 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
 
-  /* CureWise semantic extras */
+  --color-border-soft: var(--border-soft);
+  --color-faint: var(--faint);
   --color-primary-strong: var(--primary-strong);
   --color-primary-soft: var(--primary-soft);
   --color-on-primary: var(--on-primary);
@@ -171,19 +186,28 @@
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
 
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-serif: var(--font-newsreader), ui-serif, Georgia, serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  /* Two families only. font-serif is aliased to the sans so legacy
+     usages inherit Archivo instead of introducing a third face. */
+  --font-sans: var(--font-archivo), -apple-system, BlinkMacSystemFont,
+    "Segoe UI", system-ui, sans-serif;
+  --font-serif: var(--font-archivo), -apple-system, BlinkMacSystemFont,
+    "Segoe UI", system-ui, sans-serif;
+  --font-mono: var(--font-azeret), ui-monospace, "SF Mono", Consolas, monospace;
 
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --radius-full: 999px;
+  --radius-sm: var(--r-sm);
+  --radius-md: var(--r-md);
+  --radius-lg: var(--r-lg);
+  --radius-xl: var(--r-lg);
+  --radius-2xl: var(--r-xl);
+  --radius-full: var(--r-full);
 
-  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quint: var(--ease-enter);
+  --ease-out-expo: var(--ease-enter);
 }
+
+/* ------------------------------------------------------------------ */
+/*  Base                                                               */
+/* ------------------------------------------------------------------ */
 
 @layer base {
   * {
@@ -197,8 +221,9 @@
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-sans);
-    font-size: 1rem;
-    line-height: 1.6;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
@@ -206,10 +231,15 @@
   h1,
   h2,
   h3 {
-    font-family: var(--font-serif);
-    letter-spacing: -0.015em;
+    letter-spacing: -0.01em;
     text-wrap: balance;
     line-height: 1.15;
+  }
+
+  /* Headline pattern: plain first clause, bold payoff. */
+  h2 b,
+  h3 b {
+    font-weight: 800;
   }
 
   h4,
@@ -235,6 +265,160 @@
   }
 }
 
+/* ------------------------------------------------------------------ */
+/*  Global classnames (the Bryge idioms). Every page composes these.   */
+/* ------------------------------------------------------------------ */
+
+@layer components {
+  /* Content column */
+  .site-container {
+    max-width: 990px;
+    margin-inline: auto;
+    padding-inline: 24px;
+  }
+
+  /* Section rhythm: alternate plain background and a tinted band. */
+  .section {
+    padding-block: clamp(64px, 10vw, 96px);
+  }
+  .section-band {
+    background: var(--surface-2);
+  }
+
+  /* Eyebrow / kicker pill (mono, uppercase, pulse dot) */
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted-foreground);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 14px;
+  }
+  .pulse-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: var(--primary);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  /* Hero title: light weight, bold payoff span. */
+  .hero-title {
+    font-size: clamp(32px, 5vw, 52px);
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+  }
+  .hero-title b {
+    font-weight: 600;
+  }
+
+  /* Section headline: 34px, medium, bold payoff at 800. */
+  .headline {
+    font-size: clamp(26px, 4vw, 34px);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+  .headline b {
+    font-weight: 800;
+  }
+
+  /* Card heading */
+  .card-heading {
+    font-size: 21px;
+    font-weight: 650;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+  }
+
+  /* Mono-for-data: indices, tags, timestamps, units, metadata. */
+  .mono-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+  .mono-index {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    color: var(--primary);
+  }
+
+  /* Numbered ledger rows: mono index | heading + lede | outcomes. */
+  .ledger-row {
+    display: grid;
+    grid-template-columns: 3rem 1fr;
+    gap: 8px 20px;
+    padding-block: 28px;
+    border-top: 1px solid var(--border-soft);
+  }
+
+  /* Grid-of-cells: hairline dividers with zero double borders. */
+  .cellgrid {
+    display: grid;
+    gap: 1px;
+    background: var(--border-soft);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+  }
+  .cellgrid > * {
+    background: var(--background);
+  }
+
+  /* Frosted overlay (sticky headers) */
+  .frost {
+    background: color-mix(in oklab, var(--background) 86%, transparent);
+    backdrop-filter: blur(10px);
+  }
+
+  /* Hover flood: background floods accent, text flips white.
+     Fast in, slow out so dark text never lingers. */
+  .hover-flood {
+    transition: background-color var(--dur) var(--ease-enter),
+      border-color var(--dur) var(--ease-enter);
+  }
+  .hover-flood,
+  .hover-flood * {
+    transition-property: background-color, border-color, color;
+    transition-duration: 0.25s;
+    transition-timing-function: var(--ease-exit);
+  }
+  .hover-flood:hover {
+    background: var(--primary);
+    border-color: var(--primary);
+  }
+  .hover-flood:hover,
+  .hover-flood:hover * {
+    color: #ffffff;
+    transition-duration: 0.08s;
+  }
+
+  /* Scroll reveal: visible by default; JS arms hiding only after the
+     observer is wired, with a failsafe. Never invisible without JS. */
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+  .reveal-armed .reveal {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  .reveal-armed .reveal.reveal-in {
+    opacity: 1;
+    transform: none;
+    transition: opacity var(--dur-slow) var(--ease-enter),
+      transform var(--dur-slow) var(--ease-enter);
+  }
+}
+
 @layer utilities {
   .measure {
     max-width: 68ch;
@@ -243,7 +427,17 @@
     font-variant-numeric: tabular-nums;
   }
   .animate-rise {
-    animation: rise 0.5s var(--ease-out-expo) both;
+    animation: rise 0.4s var(--ease-enter) both;
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
   }
 }
 
@@ -263,7 +457,7 @@
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: none;
   }
 }
 
@@ -275,5 +469,9 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+  .reveal-armed .reveal {
+    opacity: 1;
+    transform: none;
   }
 }

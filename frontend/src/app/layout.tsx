@@ -1,16 +1,13 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Newsreader } from "next/font/google";
+import { Archivo, Azeret_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { AuthProvider } from "@/lib/auth";
 
-const geistSans = Geist({ subsets: ["latin"], variable: "--font-geist-sans" });
-const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono" });
-const newsreader = Newsreader({
-  subsets: ["latin"],
-  variable: "--font-newsreader",
-  style: ["normal", "italic"],
-});
+// Two families only (see DESIGN.md): Archivo for everything readable,
+// Azeret Mono for indices, identifiers and measurements.
+const archivo = Archivo({ subsets: ["latin"], variable: "--font-archivo" });
+const azeretMono = Azeret_Mono({ subsets: ["latin"], variable: "--font-azeret" });
 
 export const metadata: Metadata = {
   title: "CureWise — Your calm AI health companion",
@@ -37,7 +34,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} ${newsreader.variable} h-full antialiased`}
+      className={`${archivo.variable} ${azeretMono.variable} h-full antialiased`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />

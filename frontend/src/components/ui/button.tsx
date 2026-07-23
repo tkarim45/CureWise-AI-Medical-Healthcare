@@ -12,19 +12,15 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        primary:
-          "bg-primary text-primary-foreground shadow-[var(--shadow-sm)] hover:brightness-[1.07]",
-        default:
-          "bg-primary text-primary-foreground shadow-[var(--shadow-sm)] hover:brightness-[1.07]",
-        destructive:
-          "bg-destructive text-white shadow-[var(--shadow-sm)] hover:brightness-[1.07]",
+        primary: "bg-primary text-primary-foreground hover:opacity-85",
+        default: "bg-primary text-primary-foreground hover:opacity-85",
+        destructive: "bg-destructive text-white hover:opacity-85",
         secondary:
-          "border border-border bg-card text-foreground hover:bg-secondary",
+          "border border-border bg-transparent text-foreground hover:bg-secondary",
         ghost: "text-foreground hover:bg-secondary",
         outline:
           "border border-border bg-transparent text-foreground hover:bg-secondary",
-        danger:
-          "bg-destructive text-white shadow-[var(--shadow-sm)] hover:brightness-[1.07]",
+        danger: "bg-destructive text-white hover:opacity-85",
         link: "text-primary-strong underline-offset-4 hover:underline",
       },
       size: {
@@ -62,9 +58,20 @@ function Button({
   children,
   ...props
 }: ButtonProps) {
-  const Comp = asChild ? Slot.Root : "button";
+  if (asChild) {
+    // Slot requires exactly one element child; no spinner injection here.
+    return (
+      <Slot.Root
+        data-slot="button"
+        className={cn(buttonVariants({ variant, size }), className)}
+        {...props}
+      >
+        {children}
+      </Slot.Root>
+    );
+  }
   return (
-    <Comp
+    <button
       data-slot="button"
       className={cn(buttonVariants({ variant, size }), className)}
       disabled={disabled || loading}
@@ -72,7 +79,7 @@ function Button({
     >
       {loading && <Loader2 className="size-4 animate-spin" />}
       {children}
-    </Comp>
+    </button>
   );
 }
 
