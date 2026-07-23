@@ -46,6 +46,7 @@ export default function SkinPage() {
   return (
     <PageShell>
       <PageHeader
+        eyebrow="04 · Skin check"
         title="Skin & acne check"
         lead="Upload a clear photo of the area. You'll get a calm first read and what to do next."
       />

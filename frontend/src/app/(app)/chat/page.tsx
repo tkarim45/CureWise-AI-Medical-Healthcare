@@ -47,7 +47,8 @@ export default function ChatPage() {
   return (
     <div className="flex h-[calc(100dvh-3.5rem)] flex-col md:h-dvh">
       <div className="border-b border-border px-5 py-4 sm:px-8">
-        <h1 className="text-xl font-medium">Health assistant</h1>
+        <p className="mono-label">01 · Assistant</p>
+        <h1 className="mt-1 text-xl font-medium">Health assistant</h1>
         <p className="text-sm text-muted-foreground">
           Grounded in a curated medical knowledge base.
         </p>

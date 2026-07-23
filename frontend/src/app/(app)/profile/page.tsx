@@ -119,7 +119,7 @@ export default function ProfilePage() {
 
   return (
     <PageShell>
-      <PageHeader title="Profile" lead="Your account details." />
+      <PageHeader eyebrow="Account · Profile" title="Profile" lead="Your account details." />
 
       {loading ? (
         <div className="flex items-center gap-2 text-muted-foreground">

@@ -61,6 +61,7 @@ export default function ReportPage() {
   return (
     <PageShell>
       <PageHeader
+        eyebrow="02 · Blood report"
         title="Blood report reader"
         lead="Upload a lab PDF and get it explained in plain, calm language. You can also ask a follow-up question."
       />

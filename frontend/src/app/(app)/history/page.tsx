@@ -91,6 +91,7 @@ export default function HistoryPage() {
   return (
     <PageShell>
       <PageHeader
+        eyebrow="Account · History"
         title="Medical history"
         lead="Keep your conditions, allergies and notes in one place. Only you can see this."
       />

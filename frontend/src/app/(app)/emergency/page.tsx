@@ -58,6 +58,7 @@ export default function EmergencyPage() {
   return (
     <PageShell>
       <PageHeader
+        eyebrow="05 · Nearby care"
         title="Nearby care"
         lead="Find hospitals near your current location. In a real emergency, call your local emergency number first."
       >

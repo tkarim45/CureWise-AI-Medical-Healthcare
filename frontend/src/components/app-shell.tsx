@@ -75,13 +75,13 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
           active={pathname === "/dashboard"}
           onClick={onNavigate}
         />
-        <p className="px-3 pt-5 pb-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        <p className="mono-label px-3 pt-6 pb-2">
           Tools
         </p>
         {TOOLS.map((item) => (
           <NavLink key={item.href} item={item} active={isActive(item.href)} onClick={onNavigate} />
         ))}
-        <p className="px-3 pt-5 pb-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        <p className="mono-label px-3 pt-6 pb-2">
           Account
         </p>
         {ACCOUNT.map((item) => (

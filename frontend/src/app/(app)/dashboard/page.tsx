@@ -14,46 +14,44 @@ export default function DashboardPage() {
 
   return (
     <PageShell>
-      <header className="mb-9">
-        <p className="text-muted-foreground">{greeting},</p>
-        <h1 className="mt-1 text-[2rem] sm:text-[2.5rem] font-medium">
+      <header className="mb-10">
+        <p className="mono-label">{greeting}</p>
+        <h1 className="mt-2 text-[28px] font-medium tracking-[-0.01em] sm:text-[34px]">
           {user?.username}
         </h1>
-        <p className="mt-3 measure text-muted-foreground">
-          Pick a tool below. Everything here is designed to help you understand
-          your health calmly, then point you toward professional care.
+        <p className="mt-3 measure text-[15px] text-muted-foreground">
+          Pick a tool below. Everything here helps you understand your health
+          calmly, then points you toward professional care.
         </p>
       </header>
 
-      <section aria-label="Tools" className="grid gap-4 sm:grid-cols-2">
+      <section aria-label="Tools" className="cellgrid sm:grid-cols-2">
         {TOOLS.map((tool, i) => {
           const IconEl = tool.icon;
+          const index = String(i + 1).padStart(2, "0");
           return (
             <Link
               key={tool.href}
               href={tool.href}
-              className="group animate-rise rounded-[var(--r-lg)] border border-border bg-surface p-5 transition-[border-color,box-shadow,transform] duration-200 ease-[var(--ease-out-quint)] hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-[var(--shadow-md)]"
-              style={{ animationDelay: `${i * 60}ms` }}
+              className="hover-flood group block p-6"
             >
-              <div className="flex items-start gap-4">
-                <span className="grid size-11 shrink-0 place-items-center rounded-[var(--r-md)] bg-primary-soft text-primary-strong">
-                  <IconEl className="size-[22px]" />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <h2 className="font-serif text-lg font-medium text-ink">
-                      {tool.label}
-                    </h2>
-                    <Icon.ArrowRight className="size-4 text-muted-foreground transition-transform duration-200 group-hover:translate-x-1 group-hover:text-primary-strong" />
-                  </div>
-                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                    {tool.description}
-                  </p>
-                </div>
+              <div className="flex items-center justify-between">
+                <span className="mono-index">{index}</span>
+                <IconEl className="size-5 text-muted-foreground" />
               </div>
+              <h2 className="card-heading mt-5 text-foreground">{tool.label}</h2>
+              <p className="mt-1.5 text-[13.5px] leading-relaxed text-muted-foreground">
+                {tool.description}
+              </p>
             </Link>
           );
         })}
+        {/* Filler cell keeps the hairline grid rectangular on even columns */}
+        {TOOLS.length % 2 === 1 && (
+          <div className="hidden items-end p-6 sm:flex">
+            <p className="mono-label">Informs · not diagnoses</p>
+          </div>
+        )}
       </section>
 
       <section className="mt-8 grid gap-3 sm:grid-cols-2">
@@ -63,7 +61,7 @@ export default function DashboardPage() {
             <Link
               key={item.href}
               href={item.href}
-              className="flex items-center gap-3 rounded-[var(--r-md)] border border-border bg-surface px-4 py-3.5 text-sm font-medium text-ink transition-colors hover:bg-surface-2"
+              className="flex items-center gap-3 rounded-[var(--r-md)] border border-border px-4 py-3.5 text-sm font-medium text-foreground transition-colors hover:bg-secondary"
             >
               <IconEl className="size-5 text-muted-foreground" />
               {item.label}
@@ -73,7 +71,7 @@ export default function DashboardPage() {
         })}
       </section>
 
-      <div className="mt-10 rounded-[var(--r-lg)] border border-border bg-surface-2/60 p-5">
+      <div className="mt-10 rounded-[var(--r-lg)] border border-border-soft bg-surface-2 p-5">
         <Disclaimer />
       </div>
     </PageShell>

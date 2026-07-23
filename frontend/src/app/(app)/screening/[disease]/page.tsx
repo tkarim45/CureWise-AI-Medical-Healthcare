@@ -164,6 +164,7 @@ export default function ScreeningDiseasePage() {
       </Link>
 
       <PageHeader
+        eyebrow="03 · Image screening"
         title={model.label}
         lead="Upload an image to screen. Educational only — always confirm with a clinician."
       />

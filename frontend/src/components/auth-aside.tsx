@@ -1,44 +1,46 @@
-import { Icon } from "@/components/icons";
-
 const POINTS = [
-  { icon: Icon.Report, text: "Blood reports, explained in plain language." },
-  { icon: Icon.Scan, text: "Image screening across seven trained models." },
-  { icon: Icon.Chat, text: "A grounded assistant that never guesses wildly." },
+  {
+    index: "01",
+    heading: "Blood reports, explained",
+    copy: "Every value set against its reference range, in plain words.",
+  },
+  {
+    index: "02",
+    heading: "Seven screening models",
+    copy: "Kidney, lymphoma, pneumonia, eye, breast imaging and two blood models.",
+  },
+  {
+    index: "03",
+    heading: "A grounded assistant",
+    copy: "Answers come from a curated medical knowledge base, never a guess.",
+  },
 ];
 
-/** The calm right-hand panel on auth screens. Decorative, hidden on small screens. */
+/** The right-hand panel on auth screens. Bryge band + mono ledger. */
 export function AuthAside() {
   return (
-    <aside className="relative hidden overflow-hidden bg-surface-2 lg:block">
-      <div
-        aria-hidden
-        className="absolute inset-0 opacity-70"
-        style={{
-          backgroundImage:
-            "radial-gradient(60rem 60rem at 85% -10%, var(--primary-soft), transparent 55%)",
-        }}
-      />
-      <div className="relative flex h-full flex-col justify-center px-14">
-        <p className="font-serif text-[2rem] leading-snug text-ink max-w-md">
-          Understand what your health is telling you, calmly.
+    <aside className="hidden border-l border-border bg-surface-2 lg:block">
+      <div className="flex h-full flex-col justify-center px-14">
+        <p className="mono-label">Why CureWise</p>
+        <p className="mt-4 max-w-md text-[28px] font-light leading-snug tracking-[-0.02em] text-foreground">
+          Understand what your health is telling you. <b className="font-semibold">Calmly.</b>
         </p>
-        <ul className="mt-10 flex flex-col gap-5">
-          {POINTS.map((p, i) => {
-            const IconEl = p.icon;
-            return (
-              <li key={i} className="flex items-center gap-4">
-                <span className="grid size-11 place-items-center rounded-[var(--r-md)] border border-border bg-surface text-primary-strong">
-                  <IconEl className="size-5" />
-                </span>
-                <span className="text-ink">{p.text}</span>
-              </li>
-            );
-          })}
-        </ul>
-        <p className="mt-12 max-w-sm text-sm text-muted-foreground">
-          CureWise informs; it does not diagnose. Always confirm findings with a
-          qualified healthcare professional.
-        </p>
+
+        <div className="mt-10 max-w-md">
+          {POINTS.map((p) => (
+            <div key={p.index} className="ledger-row !py-5">
+              <span className="mono-index pt-0.5">{p.index}</span>
+              <div>
+                <h3 className="text-[15px] font-semibold text-foreground">{p.heading}</h3>
+                <p className="mt-1 text-[13.5px] leading-relaxed text-muted-foreground">
+                  {p.copy}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <p className="mono-label mt-12">Informs · not diagnoses</p>
       </div>
     </aside>
   );

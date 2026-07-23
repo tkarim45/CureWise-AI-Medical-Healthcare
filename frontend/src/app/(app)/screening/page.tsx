@@ -56,6 +56,7 @@ export default function ScreeningPage() {
   return (
     <PageShell>
       <PageHeader
+        eyebrow="03 · Image screening"
         title="Image screening"
         lead="Choose what to screen. Each tool uses a model trained for that condition. These are educational screens, not diagnoses."
       />
