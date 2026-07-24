@@ -9,6 +9,13 @@ single `user` role.
 
 ---
 
+
+## Architecture
+
+![architecture](docs/assets/architecture.png)
+
+*Interactive/exportable version: [`docs/assets/architecture.html`](docs/assets/architecture.html).*
+
 ## What it does
 
 - **Health assistant** — a chatbot grounded in a curated medical knowledge base
