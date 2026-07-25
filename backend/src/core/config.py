@@ -1,9 +1,10 @@
 """Application configuration.
 
 All settings are read from environment variables (loaded from ``backend/.env``
-in development). Model weight paths default to the repo-relative ``data/``
-folder so the app is portable across machines, but each can be overridden with
-its ``*_MODEL_PATH`` env var.
+in development). Trained model weights live under ``backend/weights/<key>/``
+(kept out of ``data/``, which holds only datasets and sample images). Each path
+defaults to the repo-relative location and can be overridden with its
+``*_MODEL_PATH`` env var.
 """
 
 from pathlib import Path
@@ -12,7 +13,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # backend/ (parent of src/)
 BASE_DIR = Path(__file__).resolve().parents[2]
-DATA_DIR = BASE_DIR / "data"
+DATA_DIR = BASE_DIR / "data"        # datasets + sample images only
+WEIGHTS_DIR = BASE_DIR / "weights"  # trained model weights
 
 
 class Settings(BaseSettings):
@@ -50,13 +52,15 @@ class Settings(BaseSettings):
     DB_PORT: str = "5432"
 
     # --- ML model weights (repo-relative defaults, env-overridable) ---
-    KIDNEY_MODEL_PATH: str = str(DATA_DIR / "kidney_disease/Model/kidney_ct_model_1.h5")
-    BREAST_CANCER_MODEL_PATH: str = str(DATA_DIR / "Breast Cancer/Model/Breast Cancer.h5")
-    LYMPHOMA_MODEL_PATH: str = str(DATA_DIR / "Lymphoma/Lymphoma classification1.h5")
-    PNEUMONIA_MODEL_PATH: str = str(DATA_DIR / "pneumonia/model-Pneumonia Detection-88.04.h5")
-    EYE_DISEASE_MODEL_PATH: str = str(DATA_DIR / "eyedisease/eyedisease.h5")
-    BLOODCELL_MARKER_MODEL_PATH: str = str(DATA_DIR / "bloodcell/blood_cells_model.h5")
-    BLOODCELL_TYPE_MODEL_PATH: str = str(DATA_DIR / "bloodcell/image_classification_model.h5")
+    KIDNEY_MODEL_PATH: str = str(WEIGHTS_DIR / "kidney/kidney_ct_model.h5")
+    BREAST_CANCER_MODEL_PATH: str = str(WEIGHTS_DIR / "breast-cancer/breast_cancer.h5")
+    LYMPHOMA_MODEL_PATH: str = str(WEIGHTS_DIR / "lymphoma/lymphoma.h5")
+    PNEUMONIA_MODEL_PATH: str = str(WEIGHTS_DIR / "pneumonia/pneumonia.h5")
+    EYE_DISEASE_MODEL_PATH: str = str(WEIGHTS_DIR / "eye-disease/eye_disease.h5")
+    BLOODCELL_MARKER_MODEL_PATH: str = str(WEIGHTS_DIR / "bloodcell/blood_cells_model.h5")
+    BLOODCELL_TYPE_MODEL_PATH: str = str(WEIGHTS_DIR / "bloodcell/cell_type_model.h5")
+    FRACTURE_MODEL_PATH: str = str(WEIGHTS_DIR / "fracture/fracture_model.h5")
+    BRAIN_LGG_MODEL_PATH: str = str(WEIGHTS_DIR / "brain-tumor/brain_lgg_model.h5")
 
 
 settings = Settings()

@@ -35,12 +35,8 @@ Screenshot 2025-05-15 at 4.25.44 PM.png
 backend/uploads/
 
 # --- ML model weights (large; provisioned out-of-band, not committed) ---
-backend/data/Breast Cancer/Model/
-backend/data/kidney_disease/Model/
-backend/data/eyedisease/eyedisease.h5
-backend/data/Lymphoma/Lymphoma classification1.h5
-backend/data/pneumonia/model-Pneumonia Detection-88.04.h5
-backend/data/bloodcell/
+backend/weights/
+backend/ml_training/_eval_out/
 
 # --- Patient data (never commit; contains PII) ---
 backend/data/blood_reports/

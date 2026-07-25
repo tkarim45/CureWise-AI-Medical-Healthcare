@@ -80,8 +80,10 @@ POST /api/disease-detection/{disease}/classify   # image -> prediction
 POST /api/disease-detection/{disease}/chat        # specialist Q&A
 ```
 
-Model weights are large (~1.2 GB total) and are not committed; they live under
-`backend/data/` and are gitignored. Provision them out of band.
+Trained model weights live under `backend/weights/<key>/` (kept separate from
+`backend/data/`, which holds only datasets and sample test images). Weights are
+large (~1.5 GB) and gitignored; provision them out of band or regenerate the
+trainable ones with `backend/ml_training/`.
 
 ---
 
@@ -122,7 +124,7 @@ Model weights are mounted from `./backend/data` into the backend container.
 
 ```
 CureWise-AI-Medical-Healthcare/
-├── backend/          # FastAPI app (src/ feature layout), model weights in data/
+├── backend/          # FastAPI app (src/), weights/ (models), data/ (datasets+samples), ml_training/
 ├── frontend/         # Next.js 16 app
 ├── docker-compose.yml
 ├── PRODUCT.md        # strategic product brief

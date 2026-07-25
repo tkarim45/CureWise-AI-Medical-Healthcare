@@ -17,7 +17,8 @@ services:
       - DB_USER=postgres
       - DB_PASSWORD=postgres
     volumes:
-      # Mount model weights from the host so the image stays small
+      # Mount weights + data from the host so the image stays small
+      - ./backend/weights:/app/weights
       - ./backend/data:/app/data
     depends_on:
       postgres:

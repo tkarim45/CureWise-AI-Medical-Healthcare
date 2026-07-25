@@ -12,8 +12,10 @@ from typing import Optional
 from src.core.config import settings
 from src.features.disease_detection.prompts import (
     BLOODCELL_PROMPT,
+    BRAIN_TUMOR_PROMPT,
     BREAST_CANCER_PROMPT,
     EYE_DISEASE_PROMPT,
+    FRACTURE_PROMPT,
     KIDNEY_DISEASE_PROMPT,
     LYMPHOMA_DISEASE_PROMPT,
     PNEUMONIA_PROMPT,
@@ -94,6 +96,24 @@ CLASSIFIERS: dict[str, ClassifierSpec] = {
         # genetic-marker set. Unverified against the original training order.
         labels=["RUNX1_RUNX1T1", "control", "NPM1", "PML_RARA", "CBFB_MYH11"],
         system_prompt=BLOODCELL_PROMPT,
+    ),
+    # --- trained in backend/ml_training (see README there) ---
+    "fracture": ClassifierSpec(
+        key="fracture",
+        label="Bone Fracture (X-ray)",
+        model_path=settings.FRACTURE_MODEL_PATH,
+        input_size=(224, 224),
+        labels=["fractured", "not fractured"],
+        system_prompt=FRACTURE_PROMPT,
+    ),
+    "brain-tumor": ClassifierSpec(
+        key="brain-tumor",
+        label="Brain Tumor (MRI, LGG)",
+        model_path=settings.BRAIN_LGG_MODEL_PATH,
+        labels=["Tumor"],
+        kind="segmentation",
+        custom_objects=False,
+        system_prompt=BRAIN_TUMOR_PROMPT,
     ),
 }
 
