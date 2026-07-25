@@ -12,7 +12,10 @@ Run with the project's Python (TensorFlow/Keras). Models train on CPU
 | Key | Task | Dataset (HuggingFace) | Script | Output |
 |---|---|---|---|---|
 | `fracture` | Bone-fracture X-ray, binary classification | `Hemg/bone-fracture-detection` (8,863 imgs, balanced) | `train_fracture.py` | `data/fracture/fracture_model.h5` |
-| `brain-tumor` | Brain-tumor (LGG) 2D MRI segmentation | `gymprathap/Brain-MRI-LGG-Segmentation` (Buda TCGA) | `train_brain_lgg.py` | `data/brain_lgg/brain_lgg_model.h5` |
+| `brain-tumor` | Brain-tumor (LGG) 2D MRI segmentation | `gymprathap/Brain-MRI-LGG-Segmentation` (Buda TCGA) | `train_brain_lgg.py` | `weights/brain-tumor/brain_lgg_model.h5` |
+| `artery` | Coronary stenosis segmentation | `nirmalgaud/arcade-dataset` (ARCADE, Kaggle) | `train_artery.py` | `weights/artery/artery_model.h5` |
+| `pneumonia` | Chest-X-ray, NORMAL/PNEUMONIA | `hf-vision/chest-xray-pneumonia` (HF) | `train_pneumonia.py` | `weights/pneumonia/pneumonia.h5` |
+| `lymphoma` | Histopathology CLL/FL/MCL | `andrewmvd/malignant-lymphoma-classification` (Kaggle) | `train_lymphoma.py` | `weights/lymphoma/lymphoma.h5` |
 
 Both bake preprocessing into the model (a `Rescaling` layer), so the served
 model can be fed the registry's plain `image/255` with no mismatch. `fracture`
@@ -48,12 +51,12 @@ $PY backend/ml_training/eval_eye_disease.py
 $PY backend/ml_training/eval_breast_cancer.py  # segmentation; saves an overlay
 ```
 
-**Known issue — TensorFlow version:** the `lymphoma` and `pneumonia` weights
-were trained on an older TensorFlow and fail to load under TF 2.20
-(`Cannot convert '((None,1280),)' to a shape`). They load under the pinned
-`tensorflow==2.16.2` in `requirements.txt`; keep the serving image on that
-version, or re-save those two models under the current TF. `kidney` also
-reports confidence > 100% because its output layer isn't softmax-normalized.
+**Known issue:** `lymphoma` and `pneumonia` fail to load on **both** TF 2.16.2
+and 2.20 (old save format) — see "Broken originals" below; the fix is
+retraining, not a version pin. All other originals (kidney, eye-disease,
+breast-cancer, bloodcell) plus fracture/brain/artery load on 2.16.2, the pinned
+serving version. `kidney` reports confidence > 100% (output not softmax-
+normalized).
 
 ## Honest scope
 
@@ -63,9 +66,21 @@ train → save → serve → predict loop, not clinical-grade accuracy. Every
 prediction is served behind the product-wide "informs, not diagnoses"
 disclaimer.
 
-## Not included
+## Artery (ARCADE) — needs Kaggle
 
-Coronary artery / stenosis segmentation (ARCADE) was requested but the ARCADE
-dataset is not available on HuggingFace and needs Kaggle access. To add it,
-drop a Keras `.h5` at `data/artery/artery_model.h5` and register a spec in
-`src/features/disease_detection/specs.py`.
+`train_artery.py` reads the ARCADE stenosis split (COCO polygon annotations →
+binary masks) and trains a segmentation U-Net. Provide Kaggle creds
+(`KAGGLE_USERNAME` / `KAGGLE_KEY`) and download once:
+
+```bash
+kaggle datasets download -d nirmalgaud/arcade-dataset -p /tmp/arcade --unzip
+DATA_DIR=/tmp/arcade/arcade/stenosis $PY backend/ml_training/train_artery.py
+```
+
+## Retrained originals
+
+The original `lymphoma` and `pneumonia` weights failed to deserialize on **both**
+TF 2.16.2 and 2.20 (old Keras save format) — a version pin does not fix them, so
+they were retrained from source with `train_pneumonia.py` / `train_lymphoma.py`
+(MobileNetV2 transfer, matching the registry's label order). The `eval_*.py`
+scripts still work as quick prediction demos on the new weights.

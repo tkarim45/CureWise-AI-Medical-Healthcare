@@ -71,7 +71,12 @@ def predict_classification(spec: ClassifierSpec, image_bytes: bytes) -> dict:
     arr = np.asarray(image, dtype=np.float32) / 255.0
     arr = np.expand_dims(arr, axis=0)
 
-    preds = model.predict(arr, verbose=0)[0]
+    preds = np.asarray(model.predict(arr, verbose=0)[0], dtype=np.float64)
+    # Some legacy models don't end in a softmax; normalize to a probability
+    # distribution so confidence stays within 0-100%.
+    if preds.min() < 0 or not np.isclose(preds.sum(), 1.0, atol=1e-2):
+        e = np.exp(preds - preds.max())
+        preds = e / e.sum()
     idx = int(np.argmax(preds))
     return {
         "predicted_class": spec.labels[idx],

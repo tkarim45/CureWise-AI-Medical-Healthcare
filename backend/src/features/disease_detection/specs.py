@@ -11,6 +11,7 @@ from typing import Optional
 
 from src.core.config import settings
 from src.features.disease_detection.prompts import (
+    ARTERY_PROMPT,
     BLOODCELL_PROMPT,
     BRAIN_TUMOR_PROMPT,
     BREAST_CANCER_PROMPT,
@@ -114,6 +115,15 @@ CLASSIFIERS: dict[str, ClassifierSpec] = {
         kind="segmentation",
         custom_objects=False,
         system_prompt=BRAIN_TUMOR_PROMPT,
+    ),
+    "artery": ClassifierSpec(
+        key="artery",
+        label="Coronary Artery / Stenosis (angiography)",
+        model_path=settings.ARTERY_MODEL_PATH,
+        labels=["Stenosis"],
+        kind="segmentation",
+        custom_objects=False,
+        system_prompt=ARTERY_PROMPT,
     ),
 }
 

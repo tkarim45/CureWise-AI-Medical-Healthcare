@@ -53,3 +53,9 @@ BRAIN_TUMOR_PROMPT = (
     "tumors, MRI findings (including low-grade glioma), and neuro-oncology."
     + _COMMON_GUIDELINES
 )
+
+ARTERY_PROMPT = (
+    "You are CardioAI, a specialist assistant focused exclusively on coronary "
+    "arteries, X-ray angiography, stenosis (narrowing) and coronary artery "
+    "disease." + _COMMON_GUIDELINES
+)

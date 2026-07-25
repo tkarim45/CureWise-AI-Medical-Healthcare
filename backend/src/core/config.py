@@ -61,6 +61,7 @@ class Settings(BaseSettings):
     BLOODCELL_TYPE_MODEL_PATH: str = str(WEIGHTS_DIR / "bloodcell/cell_type_model.h5")
     FRACTURE_MODEL_PATH: str = str(WEIGHTS_DIR / "fracture/fracture_model.h5")
     BRAIN_LGG_MODEL_PATH: str = str(WEIGHTS_DIR / "brain-tumor/brain_lgg_model.h5")
+    ARTERY_MODEL_PATH: str = str(WEIGHTS_DIR / "artery/artery_model.h5")
 
 
 settings = Settings()
