@@ -185,84 +185,107 @@
     <div class="header"><div class="header-row"><div class="pulse-dot"></div>
       <h1>CureWise — Architecture</h1>
       <div class="toolbar"><div class="toolbar-actions"><button onclick="copyAsImage(this)">📋 Copy</button><button onclick="downloadPNG(this)">🖼️ PNG</button><button onclick="downloadPDF(this)">📄 PDF</button></div><button class="toolbar-toggle" onclick="this.parentElement.classList.toggle('expanded')">⋯</button></div>
-    </div><p class="subtitle">Production healthcare platform: conversational medical AI, report parsing + RAG, image-based disease detection, and realtime DB agents.</p></div>
-    <div class="diagram-container"><svg viewBox="0 0 1280 600">
+    </div><p class="subtitle">A personal AI health companion: one account, a set of self-serve tools that help a user understand their health calmly, then point them toward professional care. It informs; it does not diagnose.</p></div>
+    <div class="diagram-container"><svg viewBox="0 0 1310 790">
 <defs><marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#64748b"/></marker><marker id="loop" markerWidth="11" markerHeight="8" refX="9" refY="4" orient="auto"><polygon points="0 0, 11 4, 0 8" fill="#22d3ee"/></marker><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e293b" stroke-width="0.5"/></pattern></defs>
-<rect width="1280" height="600" fill="url(#grid)"/>
-<rect x="24" y="150" width="270" height="300" rx="12" fill="rgba(34,211,238,0.04)" stroke="#22d3ee" stroke-width="1" stroke-dasharray="8,4"/>
-<text x="38" y="168" fill="#22d3ee" font-size="10" font-weight="600">① CLIENTS</text>
-<rect x="310" y="70" width="540" height="468" rx="12" fill="rgba(52,211,153,0.04)" stroke="#34d399" stroke-width="1" stroke-dasharray="8,4"/>
-<text x="324" y="88" fill="#34d399" font-size="10" font-weight="600">② FASTAPI  ·  gateway → medical AI features</text>
-<rect x="866" y="70" width="390" height="468" rx="12" fill="rgba(251,191,36,0.04)" stroke="#fbbf24" stroke-width="1" stroke-dasharray="8,4"/>
-<text x="880" y="88" fill="#fbbf24" font-size="10" font-weight="600">AI + DATA</text>
-<line x1="215" y1="259" x2="250" y2="259" stroke="#22d3ee" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-<text x="232" y="254" fill="#94a3b8" font-size="8.5" text-anchor="middle">HTTPS</text>
-<path d="M 378 228 C 416 228, 416 126, 455 126" fill="none" stroke="#34d399" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-<line x1="420" y1="259" x2="455" y2="259" stroke="#34d399" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-<path d="M 378 290 C 416 290, 416 391, 455 391" fill="none" stroke="#34d399" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-<path d="M 625 126 C 664 126, 664 228, 702 228" fill="none" stroke="#a78bfa" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-<text x="664" y="172" fill="#94a3b8" font-size="8.5" text-anchor="middle">retrieve</text>
-<path d="M 582 95 C 746 95, 746 157, 910 157" fill="none" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-<text x="746" y="121" fill="#94a3b8" font-size="8.5" text-anchor="middle">reason</text>
-<line x1="625" y1="259" x2="660" y2="259" stroke="#a78bfa" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-<text x="642" y="254" fill="#94a3b8" font-size="8.5" text-anchor="middle">index</text>
-<path d="M 625 391 C 767 391, 767 422, 910 422" fill="none" stroke="#fbbf24" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-<text x="767" y="402" fill="#94a3b8" font-size="8.5" text-anchor="middle">classify</text>
-<path d="M 830 259 C 870 259, 870 157, 910 157" fill="none" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#arrowhead)"/>
-<text x="870" y="203" fill="#94a3b8" font-size="8.5" text-anchor="middle">embed</text>
-<path d="M 625 391 C 664 391, 664 360, 702 360" fill="none" stroke="#a78bfa" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-<rect x="45" y="228" width="170" height="62" rx="7" fill="#0f172a"/>
-<rect x="45" y="228" width="170" height="62" rx="7" fill="rgba(8, 51, 68, 0.4)" stroke="#22d3ee" stroke-width="1.5"/>
-<text x="130" y="248" fill="#fff" font-size="11" font-weight="600" text-anchor="middle">React App</text>
-<text x="130" y="264" fill="#94a3b8" font-size="9" text-anchor="middle">patient + clinician</text>
-<rect x="250" y="228" width="170" height="62" rx="7" fill="#0f172a"/>
-<rect x="250" y="228" width="170" height="62" rx="7" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.5"/>
-<text x="335" y="248" fill="#fff" font-size="11" font-weight="600" text-anchor="middle">FastAPI</text>
-<text x="335" y="264" fill="#94a3b8" font-size="9" text-anchor="middle">gateway + auth</text>
-<rect x="455" y="95" width="170" height="62" rx="7" fill="#0f172a"/>
-<rect x="455" y="95" width="170" height="62" rx="7" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.5"/>
-<text x="540" y="115" fill="#fff" font-size="11" font-weight="600" text-anchor="middle">Conversational AI</text>
-<text x="540" y="131" fill="#94a3b8" font-size="9" text-anchor="middle">medical Q&amp;A</text>
-<rect x="455" y="228" width="170" height="62" rx="7" fill="#0f172a"/>
-<rect x="455" y="228" width="170" height="62" rx="7" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.5"/>
-<text x="540" y="248" fill="#fff" font-size="11" font-weight="600" text-anchor="middle">Report Parsing</text>
-<text x="540" y="264" fill="#94a3b8" font-size="9" text-anchor="middle">LlamaParse</text>
-<rect x="455" y="360" width="170" height="62" rx="7" fill="#0f172a"/>
-<rect x="455" y="360" width="170" height="62" rx="7" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.5"/>
-<text x="540" y="380" fill="#fff" font-size="11" font-weight="600" text-anchor="middle">Disease Detection</text>
-<text x="540" y="396" fill="#94a3b8" font-size="9" text-anchor="middle">image → vision model</text>
-<rect x="660" y="228" width="170" height="62" rx="7" fill="#0f172a"/>
-<rect x="660" y="228" width="170" height="62" rx="7" fill="rgba(76, 29, 149, 0.4)" stroke="#a78bfa" stroke-width="1.5"/>
-<text x="745" y="248" fill="#fff" font-size="11" font-weight="600" text-anchor="middle">RAG</text>
-<text x="745" y="264" fill="#94a3b8" font-size="9" text-anchor="middle">Pinecone + embeddings</text>
-<rect x="660" y="360" width="170" height="62" rx="7" fill="#0f172a"/>
-<rect x="660" y="360" width="170" height="62" rx="7" fill="rgba(76, 29, 149, 0.4)" stroke="#a78bfa" stroke-width="1.5"/>
-<text x="745" y="380" fill="#fff" font-size="11" font-weight="600" text-anchor="middle">Realtime DB</text>
-<text x="745" y="396" fill="#94a3b8" font-size="9" text-anchor="middle">agent-queried</text>
-<rect x="867" y="95" width="170" height="62" rx="7" fill="#0f172a"/>
-<rect x="867" y="95" width="170" height="62" rx="7" fill="rgba(120, 53, 15, 0.3)" stroke="#fbbf24" stroke-width="1.5"/>
-<text x="952" y="115" fill="#fff" font-size="11" font-weight="600" text-anchor="middle">OpenAI</text>
-<text x="952" y="131" fill="#94a3b8" font-size="9" text-anchor="middle">gpt-4o-mini + embed</text>
-<rect x="867" y="360" width="170" height="62" rx="7" fill="#0f172a"/>
-<rect x="867" y="360" width="170" height="62" rx="7" fill="rgba(120, 53, 15, 0.3)" stroke="#fbbf24" stroke-width="1.5"/>
-<text x="952" y="380" fill="#fff" font-size="11" font-weight="600" text-anchor="middle">Groq / Llama</text>
-<text x="952" y="396" fill="#94a3b8" font-size="9" text-anchor="middle">vision + disease chat</text>
-<text x="40" y="572" fill="#fff" font-size="10" font-weight="600">Legend</text>
-<rect x="106" y="563" width="15" height="10" rx="2" fill="rgba(8, 51, 68, 0.4)" stroke="#22d3ee" stroke-width="1"/>
-<text x="126" y="572" fill="#94a3b8" font-size="8.5">Frontend/UI</text>
-<rect x="223" y="563" width="15" height="10" rx="2" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1"/>
-<text x="243" y="572" fill="#94a3b8" font-size="8.5">Backend</text>
-<rect x="312" y="563" width="15" height="10" rx="2" fill="rgba(76, 29, 149, 0.4)" stroke="#a78bfa" stroke-width="1"/>
-<text x="332" y="572" fill="#94a3b8" font-size="8.5">Data/Index</text>
-<rect x="422" y="563" width="15" height="10" rx="2" fill="rgba(120, 53, 15, 0.3)" stroke="#fbbf24" stroke-width="1"/>
-<text x="442" y="572" fill="#94a3b8" font-size="8.5">Model/Cloud</text>
-<rect x="539" y="563" width="15" height="10" rx="2" fill="rgba(136, 19, 55, 0.4)" stroke="#fb7185" stroke-width="1"/>
-<text x="559" y="572" fill="#94a3b8" font-size="8.5">Safety/Gate</text>
-<rect x="656" y="563" width="15" height="10" rx="2" fill="rgba(251, 146, 60, 0.3)" stroke="#fb923c" stroke-width="1"/>
-<text x="676" y="572" fill="#94a3b8" font-size="8.5">Pipeline</text>
+<rect width="1310" height="790" fill="url(#grid)"/>
+<rect x="41" y="249" width="229" height="158" rx="12" fill="rgba(34,211,238,0.04)" stroke="#22d3ee" stroke-width="1" stroke-dasharray="8,4"/>
+<text x="55" y="268" fill="#22d3ee" font-size="10" font-weight="600">FRONTEND</text>
+<rect x="356" y="159" width="208" height="368" rx="12" fill="rgba(52,211,153,0.04)" stroke="#34d399" stroke-width="1" stroke-dasharray="8,4"/>
+<text x="370" y="178" fill="#34d399" font-size="10" font-weight="600">BACKEND CORE</text>
+<rect x="689" y="36" width="203" height="673" rx="12" fill="rgba(167,139,250,0.04)" stroke="#a78bfa" stroke-width="1" stroke-dasharray="8,4"/>
+<text x="703" y="56" fill="#a78bfa" font-size="10" font-weight="600">FEATURE-FIRST MODULES</text>
+<rect x="1010" y="29" width="241" height="698" rx="12" fill="rgba(251,191,36,0.04)" stroke="#fbbf24" stroke-width="1" stroke-dasharray="8,4"/>
+<text x="1024" y="48" fill="#fbbf24" font-size="10" font-weight="600">MODELS + PROVIDERS</text>
+<path d="M 243 340 C 314 340, 314 250, 385 250" fill="none" stroke="#22d3ee" stroke-width="1.6" marker-end="url(#arrowhead)"/>
+<line x1="460" y1="291" x2="460" y2="419" stroke="#a78bfa" stroke-width="1.6" marker-end="url(#arrowhead)"/>
+<text x="491" y="358" fill="#cbd5e1" font-size="8.5" text-anchor="middle">raw SQL</text>
+<path d="M 535 250 C 625 250, 625 120, 715 120" fill="none" stroke="#34d399" stroke-width="1.6" marker-end="url(#arrowhead)"/>
+<path d="M 535 250 C 625 250, 625 250, 715 250" fill="none" stroke="#34d399" stroke-width="1.6" marker-end="url(#arrowhead)"/>
+<path d="M 535 250 C 625 250, 625 380, 715 380" fill="none" stroke="#34d399" stroke-width="1.6" marker-end="url(#arrowhead)"/>
+<path d="M 535 250 C 625 250, 625 510, 715 510" fill="none" stroke="#34d399" stroke-width="1.6" marker-end="url(#arrowhead)"/>
+<path d="M 535 250 C 625 250, 625 650, 715 650" fill="none" stroke="#34d399" stroke-width="1.6" marker-end="url(#arrowhead)"/>
+<line x1="865" y1="120" x2="1052" y2="120" stroke="#fbbf24" stroke-width="1.6" marker-end="url(#arrowhead)"/>
+<text x="958" y="113" fill="#cbd5e1" font-size="8.5" text-anchor="middle">chat + embed</text>
+<path d="M 865 120 C 960 120, 960 270, 1055 270" fill="none" stroke="#a78bfa" stroke-width="1.6" marker-end="url(#arrowhead)"/>
+<path d="M 865 250 C 960 250, 960 410, 1055 410" fill="none" stroke="#fbbf24" stroke-width="1.6" marker-end="url(#arrowhead)"/>
+<line x1="865" y1="510" x2="1046" y2="530" stroke="#fbbf24" stroke-width="1.6" marker-end="url(#arrowhead)"/>
+<text x="956" y="513" fill="#cbd5e1" font-size="8.5" text-anchor="middle">vision</text>
+<path d="M 865 380 C 950 380, 950 660, 1036 660" fill="none" stroke="#a78bfa" stroke-width="1.6" marker-end="url(#arrowhead)"/>
+<rect x="67" y="299" width="177" height="82" rx="7" fill="#0f172a"/>
+<rect x="67" y="299" width="177" height="82" rx="7" fill="rgba(8, 51, 68, 0.4)" stroke="#22d3ee" stroke-width="1.5"/>
+<text x="155" y="321" fill="#fff" font-size="11.5" font-weight="600" text-anchor="middle">Next.js 16 · React 19</text>
+<text x="155" y="339" fill="#94a3b8" font-size="9.0" text-anchor="middle">TypeScript · Tailwind v4</text>
+<text x="155" y="354" fill="#94a3b8" font-size="9.0" text-anchor="middle">light/dark · WCAG 2.2 AA</text>
+<rect x="385" y="209" width="150" height="82" rx="7" fill="#0f172a"/>
+<rect x="385" y="209" width="150" height="82" rx="7" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.5"/>
+<text x="460" y="231" fill="#fff" font-size="11.5" font-weight="600" text-anchor="middle">FastAPI</text>
+<text x="460" y="249" fill="#94a3b8" font-size="9.0" text-anchor="middle">app factory · routers</text>
+<text x="460" y="264" fill="#94a3b8" font-size="9.0" text-anchor="middle">JWT · pooled Postgres</text>
+<rect x="382" y="419" width="156" height="82" rx="7" fill="#0f172a"/>
+<rect x="382" y="419" width="156" height="82" rx="7" fill="rgba(76, 29, 149, 0.4)" stroke="#a78bfa" stroke-width="1.5"/>
+<text x="460" y="441" fill="#fff" font-size="11.5" font-weight="600" text-anchor="middle">PostgreSQL</text>
+<text x="460" y="459" fill="#94a3b8" font-size="9.0" text-anchor="middle">users · medical_history</text>
+<text x="460" y="474" fill="#94a3b8" font-size="9.0" text-anchor="middle">general_chat_history</text>
+<rect x="715" y="86" width="150" height="67" rx="7" fill="#0f172a"/>
+<rect x="715" y="86" width="150" height="67" rx="7" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.5"/>
+<text x="790" y="108" fill="#fff" font-size="11.5" font-weight="600" text-anchor="middle">chat</text>
+<text x="790" y="126" fill="#94a3b8" font-size="9.0" text-anchor="middle">RAG chatbot</text>
+<rect x="715" y="216" width="150" height="67" rx="7" fill="#0f172a"/>
+<rect x="715" y="216" width="150" height="67" rx="7" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.5"/>
+<text x="790" y="238" fill="#fff" font-size="11.5" font-weight="600" text-anchor="middle">medical_report</text>
+<text x="790" y="256" fill="#94a3b8" font-size="9.0" text-anchor="middle">blood-report parsing</text>
+<rect x="715" y="346" width="150" height="67" rx="7" fill="#0f172a"/>
+<rect x="715" y="346" width="150" height="67" rx="7" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.5"/>
+<text x="790" y="368" fill="#fff" font-size="11.5" font-weight="600" text-anchor="middle">disease_detection</text>
+<text x="790" y="386" fill="#94a3b8" font-size="9.0" text-anchor="middle">7 models · registry</text>
+<rect x="715" y="476" width="150" height="67" rx="7" fill="#0f172a"/>
+<rect x="715" y="476" width="150" height="67" rx="7" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.5"/>
+<text x="790" y="498" fill="#fff" font-size="11.5" font-weight="600" text-anchor="middle">skin</text>
+<text x="790" y="516" fill="#94a3b8" font-size="9.0" text-anchor="middle">acne vision</text>
+<rect x="715" y="616" width="151" height="67" rx="7" fill="#0f172a"/>
+<rect x="715" y="616" width="151" height="67" rx="7" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1.5"/>
+<text x="790" y="638" fill="#fff" font-size="11.5" font-weight="600" text-anchor="middle">emergency</text>
+<text x="790" y="656" fill="#94a3b8" font-size="9.0" text-anchor="middle">OpenStreetMap Overpass</text>
+<rect x="1052" y="79" width="156" height="82" rx="7" fill="#0f172a"/>
+<rect x="1052" y="79" width="156" height="82" rx="7" fill="rgba(120, 53, 15, 0.3)" stroke="#fbbf24" stroke-width="1.5"/>
+<text x="1130" y="101" fill="#fff" font-size="11.5" font-weight="600" text-anchor="middle">OpenAI gpt-4o-mini</text>
+<text x="1130" y="119" fill="#94a3b8" font-size="9.0" text-anchor="middle">chat · embeddings</text>
+<text x="1130" y="134" fill="#94a3b8" font-size="9.0" text-anchor="middle">report structuring</text>
+<rect x="1055" y="229" width="151" height="82" rx="7" fill="#0f172a"/>
+<rect x="1055" y="229" width="151" height="82" rx="7" fill="rgba(76, 29, 149, 0.4)" stroke="#a78bfa" stroke-width="1.5"/>
+<text x="1130" y="251" fill="#fff" font-size="11.5" font-weight="600" text-anchor="middle">Pinecone</text>
+<text x="1130" y="269" fill="#94a3b8" font-size="9.0" text-anchor="middle">text-embedding-3-small</text>
+<text x="1130" y="284" fill="#94a3b8" font-size="9.0" text-anchor="middle">1536-dim</text>
+<rect x="1055" y="376" width="150" height="67" rx="7" fill="#0f172a"/>
+<rect x="1055" y="376" width="150" height="67" rx="7" fill="rgba(120, 53, 15, 0.3)" stroke="#fbbf24" stroke-width="1.5"/>
+<text x="1130" y="398" fill="#fff" font-size="11.5" font-weight="600" text-anchor="middle">LlamaParse</text>
+<text x="1130" y="416" fill="#94a3b8" font-size="9.0" text-anchor="middle">PDF → structured</text>
+<rect x="1046" y="496" width="167" height="67" rx="7" fill="#0f172a"/>
+<rect x="1046" y="496" width="167" height="67" rx="7" fill="rgba(120, 53, 15, 0.3)" stroke="#fbbf24" stroke-width="1.5"/>
+<text x="1130" y="518" fill="#fff" font-size="11.5" font-weight="600" text-anchor="middle">Groq llama-3.3-70b</text>
+<text x="1130" y="536" fill="#94a3b8" font-size="9.0" text-anchor="middle">per-disease chat · vision</text>
+<rect x="1036" y="619" width="189" height="82" rx="7" fill="#0f172a"/>
+<rect x="1036" y="619" width="189" height="82" rx="7" fill="rgba(76, 29, 149, 0.4)" stroke="#a78bfa" stroke-width="1.5"/>
+<text x="1130" y="641" fill="#fff" font-size="11.5" font-weight="600" text-anchor="middle">7 Keras Models</text>
+<text x="1130" y="659" fill="#94a3b8" font-size="9.0" text-anchor="middle">kidney · lymphoma · pneumonia</text>
+<text x="1130" y="674" fill="#94a3b8" font-size="9.0" text-anchor="middle">eye · breast · blood · AML</text>
+<text x="40" y="762" fill="#fff" font-size="10" font-weight="600">Legend</text>
+<rect x="106" y="753" width="15" height="10" rx="2" fill="rgba(8, 51, 68, 0.4)" stroke="#22d3ee" stroke-width="1"/>
+<text x="126" y="762" fill="#94a3b8" font-size="8.5">Frontend/UI</text>
+<rect x="210.1" y="753" width="15" height="10" rx="2" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1"/>
+<text x="230.1" y="762" fill="#94a3b8" font-size="8.5">Backend</text>
+<rect x="293.79999999999995" y="753" width="15" height="10" rx="2" fill="rgba(76, 29, 149, 0.4)" stroke="#a78bfa" stroke-width="1"/>
+<text x="313.79999999999995" y="762" fill="#94a3b8" font-size="8.5">Data/Index</text>
+<rect x="392.79999999999995" y="753" width="15" height="10" rx="2" fill="rgba(120, 53, 15, 0.3)" stroke="#fbbf24" stroke-width="1"/>
+<text x="412.79999999999995" y="762" fill="#94a3b8" font-size="8.5">Model/Cloud</text>
+<rect x="496.9" y="753" width="15" height="10" rx="2" fill="rgba(136, 19, 55, 0.4)" stroke="#fb7185" stroke-width="1"/>
+<text x="516.9" y="762" fill="#94a3b8" font-size="8.5">Eval/Gate</text>
+<rect x="590.8" y="753" width="15" height="10" rx="2" fill="rgba(30, 41, 59, 0.5)" stroke="#94a3b8" stroke-width="1"/>
+<text x="610.8" y="762" fill="#94a3b8" font-size="8.5">External</text>
 </svg></div>
-    <div class="cards"><div class="card"><div class="card-header"><div class="card-dot cyan"></div><h3>Clients</h3></div><ul><li>• React app for patients + clinicians</li><li>• FastAPI gateway with auth</li><li>• one API, several medical AI features</li></ul></div><div class="card"><div class="card-header"><div class="card-dot emerald"></div><h3>AI features</h3></div><ul><li>• conversational medical Q&amp;A (RAG-grounded)</li><li>• medical-report parsing via LlamaParse</li><li>• image-based disease/skin detection</li></ul></div><div class="card"><div class="card-header"><div class="card-dot amber"></div><h3>Models + data</h3></div><ul><li>• OpenAI gpt-4o-mini + text-embedding-3-small</li><li>• Groq/Llama for vision + disease chat</li><li>• Pinecone RAG + realtime DB · Docker</li></ul></div></div>
-    <p class="footer">CureWise-AI-Medical-Healthcare · OpenAI + Groq/Llama · RAG (Pinecone) · LlamaParse · FastAPI + React + Docker</p>
+    <div class="cards"><div class="card"><div class="card-header"><div class="card-dot violet"></div><h3>Feature-first backend</h3></div><ul><li>• each feature is router.py + service.py + schemas.py under features/</li><li>• chat (RAG) · medical_report (LlamaParse) · disease_detection (7 models)</li><li>• skin (acne vision) · emergency (nearby hospitals) · profile · medical_history</li><li>• single `user` role — no hospital, doctor, admin or appointment features</li></ul></div><div class="card"><div class="card-header"><div class="card-dot amber"></div><h3>Models + providers</h3></div><ul><li>• OpenAI gpt-4o-mini for chat, embeddings and report structuring</li><li>• Groq llama-3.3-70b / llama-4-scout for per-disease chat and skin vision</li><li>• RAG on Pinecone with text-embedding-3-small (1536-dim)</li><li>• 7 Keras/TensorFlow image models, lazily loaded and cached</li></ul></div><div class="card"><div class="card-header"><div class="card-dot cyan"></div><h3>Adding a model is a data change</h3></div><ul><li>• specs.py holds key, weights path, input size, labels, optional chat prompt</li><li>• so a new image model needs no new endpoint code</li><li>• routes: list · /{disease}/classify · /{disease}/chat</li><li>• every AI result carries a persistent disclaimer: informs, does not diagnose</li></ul></div></div>
+    <p class="footer">CureWise · Next.js 16 + React 19 · FastAPI + PostgreSQL · OpenAI + Groq · Pinecone RAG · LlamaParse · 7 Keras models</p>
   </div>
 <script>
     async function copyAsImage(btn) {
